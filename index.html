@@ -1143,9 +1143,17 @@ function saveSession() {
 
   if (!exercises.length) { showToast('Ajoute au moins un exercice !', ''); return; }
 
-  const session = { id: Date.now(), name, type, date, duration, notes, rpe, rating: starRating, exercises };
+  const id = editingSessionId || Date.now();
+  const session = { id, name, type, date, duration, notes, rpe, rating: starRating, exercises };
   const prs = detectPRs(session);
-  sessions.unshift(session);
+  if (editingSessionId) {
+    const idx = sessions.findIndex(s => s.id === editingSessionId);
+    if (idx !== -1) sessions[idx] = session;
+  } else {
+    sessions.unshift(session);
+  }
+  editingSessionId = null;
+  document.querySelector('#page-log .topbar-title').textContent = 'Nouvelle séance';
   save();
   resetForm();
   goPage('home', document.querySelectorAll('.nav-item')[0]);
@@ -1167,7 +1175,47 @@ function detectPRs(session) {
   return prs;
 }
 
+function editSession(id) {
+  const s = sessions.find(s => s.id === id);
+  if (!s) return;
+  editingSessionId = id;
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-log').classList.add('active');
+  document.querySelectorAll('.nav-item').forEach((b, i) => b.classList.toggle('active', i === 1));
+  document.getElementById('scrollArea').scrollTop = 0;
+
+  document.querySelector('#page-log .topbar-title').textContent = 'Modifier la séance';
+
+  document.getElementById('sName').value = s.name;
+  document.getElementById('sType').value = s.type;
+  document.getElementById('sDate').value = s.date;
+  document.getElementById('sDuration').value = s.duration || '';
+  document.getElementById('sNotes').value = s.notes || '';
+  document.getElementById('sRpe').value = s.rpe || 7;
+  document.getElementById('rpeVal').textContent = s.rpe || 7;
+  starRating = s.rating || 3;
+  updateStars();
+
+  document.getElementById('exContainer').innerHTML = '';
+  exCount = 0;
+  s.exercises.forEach(ex => {
+    addEx(ex.name);
+    const sbId = 'sbex' + exCount;
+    document.getElementById(sbId).innerHTML = '';
+    ex.sets.forEach(set => {
+      addSet(sbId);
+      const rows = document.getElementById(sbId).querySelectorAll('.set-row');
+      const last = rows[rows.length - 1];
+      last.querySelector('.sw').value = set.weight;
+      last.querySelector('.sr').value = set.reps;
+    });
+  });
+}
+
 function resetForm() {
+  editingSessionId = null;
+  document.querySelector('#page-log .topbar-title').textContent = 'Nouvelle séance';
   document.getElementById('sName').value = '';
   document.getElementById('sDuration').value = '';
   document.getElementById('sNotes').value = '';
@@ -1396,9 +1444,9 @@ function renderHistory() {
           </div>
         `).join('')}
         <div style="display:flex;gap:8px;margin-top:8px">
-  <button class="btn-full btn-ghost" onclick="event.stopPropagation();editSession(${s.id})">✏️ Modifier</button>
-  <button class="btn-full btn-danger" onclick="event.stopPropagation();deleteSession(${s.id})">Supprimer</button>
-</div>
+          <button class="btn-full btn-ghost" onclick="event.stopPropagation();editSession(${s.id})">✏️ Modifier</button>
+          <button class="btn-full btn-danger" onclick="event.stopPropagation();deleteSession(${s.id})">Supprimer</button>
+        </div>
       </div>
     </div>`;
   }).join('');
