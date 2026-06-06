@@ -2,1082 +2,515 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>IRONLOG</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
 
-:root{
-  --bg:       #0a0705;
-  --surface:  #130e0a;
-  --surface2: #1c1410;
-  --surface3: #251a14;
-  --border:   rgba(255,120,50,0.1);
-  --border2:  rgba(255,120,50,0.2);
-  --text:     #f5ede8;
-  --text2:    rgba(245,237,232,0.5);
-  --text3:    rgba(245,237,232,0.25);
-  --orange:   #ff6b2b;
-  --orange2:  #ff8c55;
-  --orange3:  #ffb085;
-  --red:      #ff453a;
-  --green:    #30d158;
-  --blue:     #4d9fff;
-  --yellow:   #ffd60a;
-  --hero-from:#3d1500;
-  --hero-to:  #7a2e00;
-  --r:        20px;
-  --rs:       14px;
-}
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;overflow:hidden}
+  html, body {
+    width: 100%; height: 100%;
+    background: #f0f0f0;
+    font-family: 'DM Sans', sans-serif;
+    overflow: hidden;
+  }
 
-/* ─── SPLASH ─── */
-#splash{
-  position:fixed;inset:0;
-  background:radial-gradient(ellipse at 60% 40%, #7a2e00 0%, #3d1500 40%, #0a0705 100%);
-  z-index:9999;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
-  transition:opacity .6s,transform .6s;
-}
-#splash.hide{opacity:0;transform:scale(1.04);pointer-events:none}
-.splash-logo{
-  font-family:'Syne',sans-serif;font-size:48px;font-weight:800;letter-spacing:-2px;
-  background:linear-gradient(135deg,#fff 0%,var(--orange3) 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  animation:splashPop .8s cubic-bezier(.34,1.56,.64,1) both;
-}
-.splash-sub{font-size:11px;color:rgba(255,176,133,0.5);letter-spacing:4px;font-weight:500;animation:fadeUp .5s .3s both}
-.splash-line{
-  width:40px;height:2px;background:linear-gradient(90deg,transparent,var(--orange),transparent);
-  animation:fadeUp .5s .5s both;
-}
-@keyframes splashPop{from{opacity:0;transform:scale(.6) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  .app {
+    width: 100vw;
+    height: 100vh;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
 
-/* ─── APP SHELL ─── */
-.app{
-  display:flex;flex-direction:column;height:100dvh;
-  max-width:430px;margin:0 auto;position:relative;
-}
+  /* ── Lueur ambiante ── */
+  .glow {
+    position: absolute;
+    width: 380px; height: 380px;
+    border-radius: 50%;
+    background: radial-gradient(circle,
+      rgba(160,180,255,0.07) 0%,
+      rgba(180,220,255,0.04) 50%,
+      transparent 75%
+    );
+    animation: glowPulse 5s ease-in-out infinite;
+    pointer-events: none;
+    transition: opacity 0.5s;
+  }
+  .menu-open .glow { opacity: 0.3; }
+  @keyframes glowPulse {
+    0%,100% { transform: scale(1); opacity: 0.7; }
+    50%     { transform: scale(1.12); opacity: 1; }
+  }
 
-/* ─── HERO CARD ─── */
-.hero-wrap{
-  flex-shrink:0;padding:0 14px;
-  height:240px;
-  transition:height .4s cubic-bezier(.4,0,.2,1);
-}
-.hero{
-  width:100%;height:100%;border-radius:var(--r);
-  background:linear-gradient(160deg,var(--hero-from),var(--hero-to));
-  position:relative;overflow:hidden;
-  transition:background .5s cubic-bezier(.4,0,.2,1);
-  box-shadow:0 20px 60px rgba(255,80,0,.25),0 0 0 1px rgba(255,120,50,.15);
-}
-.hero::before{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse at 80% 20%,rgba(255,140,85,.3),transparent 60%);
-  pointer-events:none;
-}
-.hero-blob{
-  position:absolute;border-radius:50%;filter:blur(50px);
-  pointer-events:none;transition:all .6s ease;
-}
-.hero-blob1{width:180px;height:180px;top:-40px;right:-30px;opacity:.5}
-.hero-blob2{width:130px;height:130px;bottom:-30px;left:0px;opacity:.3}
+  /* ── Anneaux ── */
+  .rings { position: absolute; width: 240px; height: 240px; pointer-events: none; }
+  .ring {
+    position: absolute; border-radius: 50%;
+    border: 0.5px solid rgba(150,170,230,0.13);
+    animation: ringOut 4s ease-out infinite;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+  }
+  .ring:nth-child(1){ width:270px; height:270px; animation-delay:0s; }
+  .ring:nth-child(2){ width:330px; height:330px; animation-delay:1.3s; }
+  .ring:nth-child(3){ width:400px; height:400px; animation-delay:2.6s; }
+  @keyframes ringOut {
+    0%  { opacity:0; transform:translate(-50%,-50%) scale(0.9); }
+    20% { opacity:1; }
+    100%{ opacity:0; transform:translate(-50%,-50%) scale(1.1); }
+  }
+  .menu-open .ring { animation-play-state: paused; opacity: 0; }
 
-.hero-top{
-  position:absolute;top:0;left:0;right:0;
-  display:flex;justify-content:space-between;align-items:flex-start;
-  padding:16px 18px;
-}
-.hero-logo{
-  font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:-0.5px;
-  color:rgba(255,255,255,0.9);
-}
-.hero-time{font-size:11px;color:rgba(255,200,170,0.6);font-family:'DM Mono',monospace}
-.hero-status{
-  display:flex;align-items:center;gap:5px;
-  background:rgba(255,255,255,0.08);border-radius:20px;
-  padding:4px 10px;border:1px solid rgba(255,255,255,0.1);
-}
-.hero-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+  /* ── Sphère wrapper ── */
+  .sphere-wrap {
+    position: relative;
+    width: 200px; height: 200px;
+    cursor: pointer;
+    z-index: 20;
+    transition: transform 0.55s cubic-bezier(0.34,1.56,0.64,1);
+    flex-shrink: 0;
+  }
+  .menu-open .sphere-wrap {
+    transform: translateY(180px) scale(0.62);
+  }
+  canvas {
+    display: block;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    filter: drop-shadow(0 16px 38px rgba(80,100,200,0.13))
+            drop-shadow(0 4px 10px rgba(100,130,220,0.08));
+    transition: filter 0.3s;
+  }
+  .sphere-wrap:hover canvas {
+    filter: drop-shadow(0 20px 48px rgba(80,100,200,0.22))
+            drop-shadow(0 6px 16px rgba(100,130,220,0.14));
+  }
 
-.hero-body{
-  position:absolute;left:0;right:0;bottom:0;
-  padding:16px 20px 20px;
-}
-.hero-greeting{font-size:12px;color:rgba(255,200,170,0.6);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase;font-weight:500}
-.hero-title{font-size:28px;font-weight:800;line-height:1.1;letter-spacing:-.5px}
-.hero-sub{font-size:11px;color:rgba(255,200,170,0.5);margin-top:6px;font-family:'DM Mono',monospace}
+  /* ── Status label ── */
+  .status {
+    position: absolute;
+    bottom: 44px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; align-items: center; gap: 7px;
+    font-size: 10.5px; letter-spacing: 0.2em;
+    color: rgba(0,0,0,0.18);
+    text-transform: uppercase; font-weight: 400;
+    white-space: nowrap; user-select: none;
+    transition: opacity 0.4s;
+  }
+  .menu-open .status { opacity: 0; pointer-events: none; }
+  .dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: rgba(80,200,140,0.65);
+    animation: dotBlink 2.5s ease-in-out infinite;
+  }
+  @keyframes dotBlink {
+    0%,100%{ opacity:1; } 50%{ opacity:0.2; }
+  }
 
-.hero-stat-pill{
-  display:inline-flex;align-items:center;gap:6px;
-  background:rgba(0,0,0,0.25);backdrop-filter:blur(8px);
-  border:1px solid rgba(255,255,255,0.12);border-radius:20px;
-  padding:6px 14px;margin-top:12px;
-}
-.hero-stat-val{font-size:17px;font-weight:800}
-.hero-stat-label{font-size:10px;color:rgba(255,200,170,0.5);font-family:'DM Mono',monospace;letter-spacing:.5px}
+  /* ── Hint tap ── */
+  .hint {
+    position: absolute;
+    bottom: 90px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px; color: rgba(0,0,0,0.14);
+    letter-spacing: 0.1em;
+    animation: hintFloat 3s ease-in-out infinite;
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+  .menu-open .hint { opacity: 0; }
+  @keyframes hintFloat {
+    0%,100%{ transform:translateX(-50%) translateY(0); opacity:0.6; }
+    50%    { transform:translateX(-50%) translateY(-4px); opacity:1; }
+  }
 
-/* ─── SCROLL AREA ─── */
-.scroll-area{
-  flex:1;overflow-y:auto;overflow-x:hidden;
-  padding:14px 14px 100px;
-  scroll-behavior:smooth;-webkit-overflow-scrolling:touch;
-}
-.scroll-area::-webkit-scrollbar{display:none}
+  /* ══════════════════════════════════════
+     MENU OVERLAY
+  ══════════════════════════════════════ */
+  .menu-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .menu-open .menu-overlay { pointer-events: auto; }
 
-/* ─── ACTION ROWS ─── */
-.action-group{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
-.action-row{
-  display:flex;align-items:center;gap:14px;
-  background:var(--surface);
-  border:1px solid var(--border);border-radius:var(--r);
-  padding:14px 16px;cursor:pointer;
-  transition:background .15s,transform .1s,border-color .15s;
-  text-decoration:none;color:inherit;
-  position:relative;overflow:hidden;
-}
-.action-row::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(255,107,43,.04),transparent);
-  pointer-events:none;
-}
-.action-row:active{background:var(--surface2);transform:scale(.99);border-color:var(--border2)}
-.action-icon{
-  width:40px;height:40px;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:18px;flex-shrink:0;
-}
-.action-text{flex:1}
-.action-label{font-size:15px;font-weight:700}
-.action-sub{font-size:11px;color:var(--text3);margin-top:2px;font-family:'DM Mono',monospace}
-.action-arrow{color:var(--orange);font-size:16px;opacity:.6}
+  /* Courbe de fond décorative (comme sur la ref) */
+  .menu-curve {
+    position: absolute;
+    right: -60px; top: 0; bottom: 0;
+    width: 200px;
+    opacity: 0;
+    transition: opacity 0.4s 0.1s;
+    pointer-events: none;
+  }
+  .menu-open .menu-curve { opacity: 1; }
 
-/* icon bg colors */
-.ic-orange{background:rgba(255,107,43,.15);color:var(--orange)}
-.ic-blue{background:rgba(77,159,255,.15);color:var(--blue)}
-.ic-green{background:rgba(48,209,88,.15);color:var(--green)}
-.ic-yellow{background:rgba(255,214,10,.15);color:var(--yellow)}
-.ic-red{background:rgba(255,69,58,.12);color:var(--red)}
-.ic-warm{background:rgba(255,176,133,.12);color:var(--orange3)}
+  /* ── Items de menu ── */
+  .menu-items {
+    position: absolute;
+    left: 0; right: 0;
+    top: 50%; transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    padding-bottom: 180px; /* espace pour la sphère en bas */
+  }
 
-/* ─── SECTION TITLE ─── */
-.sect{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin:18px 0 10px}
+  .menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    padding: 0 64px 0 0;
+    gap: 18px;
+    opacity: 0;
+    transform: translateX(30px);
+    transition:
+      opacity 0.38s ease,
+      transform 0.38s cubic-bezier(0.34,1.2,0.64,1);
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    margin-bottom: 28px;
+  }
 
-/* ─── CARD ─── */
-.card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);padding:18px;margin-bottom:10px;
-  position:relative;overflow:hidden;
-}
-.card::after{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(255,107,43,.15),transparent);
-}
+  /* Stagger delay à l'ouverture */
+  .menu-open .menu-item:nth-child(1){ opacity:1; transform:translateX(0); transition-delay:0.05s; }
+  .menu-open .menu-item:nth-child(2){ opacity:1; transform:translateX(0); transition-delay:0.11s; }
+  .menu-open .menu-item:nth-child(3){ opacity:1; transform:translateX(0); transition-delay:0.17s; }
+  .menu-open .menu-item:nth-child(4){ opacity:1; transform:translateX(0); transition-delay:0.23s; }
 
-/* ─── STAT ROW ─── */
-.stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
-.stat-box{
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:var(--rs);padding:14px 12px;text-align:center;
-}
-.stat-box .val{font-size:24px;font-weight:800;letter-spacing:-.5px}
-.stat-box .lbl{font-size:9px;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:.5px;margin-top:3px}
+  .item-label {
+    font-size: 22px;
+    font-weight: 300;
+    color: rgba(0,0,0,0.25);
+    letter-spacing: -0.01em;
+    transition: color 0.3s;
+  }
+  .menu-item.active .item-label {
+    color: rgba(0,0,0,0.75);
+    font-weight: 400;
+  }
 
-/* ─── BOTTOM NAV ─── */
-.bottom-nav{
-  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-  width:100%;max-width:430px;padding:0 14px 28px;z-index:50;
-}
-.nav-pill{
-  background:rgba(10,7,5,0.88);
-  backdrop-filter:blur(32px) saturate(180%);
-  -webkit-backdrop-filter:blur(32px) saturate(180%);
-  border:1px solid rgba(255,107,43,0.15);border-radius:28px;
-  display:flex;justify-content:space-around;align-items:center;
-  padding:10px 8px;
-  box-shadow:0 20px 60px rgba(0,0,0,.7),0 0 0 1px rgba(255,107,43,.06);
-}
-.nav-item{
-  display:flex;flex-direction:column;align-items:center;gap:3px;
-  cursor:pointer;padding:6px 16px;border-radius:18px;
-  transition:all .2s;border:none;background:transparent;
-  color:var(--text3);
-}
-.nav-item.active{color:var(--orange);background:rgba(255,107,43,.1);border:1px solid rgba(255,107,43,.15)}
-.nav-icon{font-size:20px;line-height:1}
-.nav-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.5px}
+  /* Icône bulle */
+  .item-icon {
+    width: 58px; height: 58px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.04);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+    position: relative;
+    transition: background 0.3s, transform 0.3s;
+  }
+  .menu-item:hover .item-icon { transform: scale(1.08); }
 
-/* ─── PAGES ─── */
-.page{display:none}
-.page.active{display:block;animation:pageIn .25s ease both}
-@keyframes pageIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  /* Item actif — contour iridescent animé */
+  .menu-item.active .item-icon {
+    background: rgba(180,200,255,0.08);
+  }
+  .menu-item.active .item-icon::before {
+    content: '';
+    position: absolute;
+    inset: -2.5px;
+    border-radius: 50%;
+    padding: 2.5px;
+    background: conic-gradient(
+      from var(--a, 0deg),
+      hsl(270,70%,70%),
+      hsl(200,80%,72%),
+      hsl(160,75%,68%),
+      hsl(50,85%,72%),
+      hsl(310,65%,68%),
+      hsl(270,70%,70%)
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: rotateBorder 3s linear infinite;
+  }
+  @property --a {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+  }
+  @keyframes rotateBorder {
+    to { --a: 360deg; }
+  }
 
-/* ─── FORMS ─── */
-.inp-wrap{margin-bottom:12px}
-.form-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.5px;margin-bottom:6px;display:block}
-.inp{
-  width:100%;background:var(--surface2);border:1px solid var(--border);
-  border-radius:var(--rs);color:var(--text);font-family:'Syne',sans-serif;
-  font-size:15px;padding:13px 15px;outline:none;
-  transition:border-color .2s;-webkit-appearance:none;
-}
-.inp:focus{border-color:rgba(255,107,43,.4);background:var(--surface3)}
-.inp::placeholder{color:var(--text3)}
-select.inp{appearance:none}
-textarea.inp{resize:none;min-height:72px;font-size:14px}
-.inp-row{display:flex;gap:8px;margin-bottom:12px}
-.inp-row .inp-wrap{flex:1;margin-bottom:0}
+  /* Pilule label actif */
+  .menu-item.active .item-label-wrap {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .active-pill {
+    display: none;
+    width: 36px; height: 18px;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.75);
+    flex-shrink: 0;
+  }
+  .menu-item.active .active-pill { display: block; }
 
-.btn{
-  width:100%;padding:16px;border:none;border-radius:var(--r);
-  font-family:'Syne',sans-serif;font-weight:800;font-size:16px;
-  cursor:pointer;transition:opacity .15s,transform .1s;
-}
-.btn:active{opacity:.85;transform:scale(.99)}
-.btn-primary{
-  background:linear-gradient(135deg,var(--orange),#c44a00);
-  color:#fff;
-  box-shadow:0 6px 24px rgba(255,107,43,.35);
-}
-.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
-.btn-danger{background:rgba(255,69,58,.1);color:var(--red);border:1px solid rgba(255,69,58,.2)}
-.btn-sm{
-  padding:8px 14px;border-radius:12px;font-family:'DM Mono',monospace;font-size:11px;
-  background:var(--surface2);border:1px solid var(--border);color:var(--text2);
-  cursor:pointer;transition:all .15s;
-}
-.btn-sm:active{background:var(--surface3);border-color:var(--border2)}
+  /* Fermer (tap ailleurs) */
+  .close-area {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+  .menu-items { z-index: 2; }
 
-/* ─── EX CARD ─── */
-.ex-card{
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:var(--rs);margin-bottom:10px;overflow:hidden;
-}
-.ex-head{display:flex;align-items:center;gap:10px;padding:12px 14px}
-.ex-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--orange);opacity:.7}
-.ex-name-inp{flex:1;background:transparent;border:none;color:var(--text);font-family:'Syne',sans-serif;font-size:15px;font-weight:700;outline:none}
-.ex-name-inp::placeholder{color:var(--text3)}
-.ex-del-btn{background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:0 4px}
-.sets-header{
-  display:grid;grid-template-columns:26px 1fr 1fr 28px;gap:6px;
-  padding:6px 14px;border-top:1px solid var(--border);
-}
-.sets-header span{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);text-align:center;letter-spacing:.5px}
-.sets-header span:first-child{text-align:left}
-.set-row{
-  display:grid;grid-template-columns:26px 1fr 1fr 28px;gap:6px;
-  padding:5px 14px;align-items:center;border-top:1px solid rgba(255,107,43,.04);
-  transition:opacity .2s;
-}
-.set-row.done-row{opacity:.3}
-.set-idx{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3)}
-.set-inp{
-  background:rgba(255,107,43,.06);border:1px solid rgba(255,107,43,.1);
-  border-radius:8px;color:var(--text);font-family:'DM Mono',monospace;
-  font-size:13px;padding:7px 5px;text-align:center;outline:none;width:100%;
-  -webkit-appearance:none;
-}
-.set-inp:focus{border-color:rgba(255,107,43,.35)}
-.set-check{
-  width:22px;height:22px;border-radius:50%;border:1.5px solid rgba(255,255,255,.2);
-  background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  font-size:11px;transition:all .2s;-webkit-appearance:none;appearance:none;
-  color:transparent;justify-self:center;
-}
-.set-check:checked{background:var(--orange);border-color:var(--orange);color:white}
-.ex-footer{display:flex;gap:8px;padding:10px 14px;border-top:1px solid rgba(255,107,43,.04)}
-
-/* ─── TAGS ─── */
-.tag{display:inline-block;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;padding:3px 10px;border-radius:20px;letter-spacing:.3px}
-.tag-push{background:rgba(255,107,43,.15);color:var(--orange);border:1px solid rgba(255,107,43,.25)}
-.tag-pull{background:rgba(77,159,255,.15);color:var(--blue);border:1px solid rgba(77,159,255,.25)}
-.tag-legs{background:rgba(48,209,88,.15);color:var(--green);border:1px solid rgba(48,209,88,.25)}
-.tag-upper{background:rgba(255,176,133,.15);color:var(--orange3);border:1px solid rgba(255,176,133,.25)}
-.tag-lower{background:rgba(255,214,10,.15);color:var(--yellow);border:1px solid rgba(255,214,10,.25)}
-.tag-full{background:rgba(255,255,255,.07);color:var(--text2);border:1px solid var(--border)}
-
-/* ─── STARS ─── */
-.stars{display:flex;gap:6px}
-.star{font-size:26px;cursor:pointer;color:rgba(255,255,255,.1);transition:color .15s,transform .1s}
-.star.on{color:var(--yellow);filter:drop-shadow(0 0 5px rgba(255,214,10,.5))}
-.star:active{transform:scale(1.3)}
-
-/* ─── RPE SLIDER ─── */
-.rpe-row{display:flex;align-items:center;gap:12px}
-.rpe-val{font-size:28px;font-weight:800;color:var(--orange);min-width:32px}
-input[type=range]{flex:1;-webkit-appearance:none;height:3px;border-radius:2px;background:rgba(255,107,43,.2);outline:none}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--orange);cursor:pointer;box-shadow:0 0 8px rgba(255,107,43,.5)}
-
-/* ─── HISTORY ─── */
-.hist-item{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
-  padding:16px;margin-bottom:8px;cursor:pointer;transition:background .15s,border-color .15s;
-}
-.hist-item:active{background:var(--surface2);border-color:var(--border2)}
-.hist-top{display:flex;justify-content:space-between;align-items:flex-start}
-.hist-title{font-size:16px;font-weight:700;margin-top:4px}
-.hist-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3)}
-.hist-meta{font-size:11px;color:var(--text2);margin-top:8px;font-family:'DM Mono',monospace}
-.hist-detail{max-height:0;overflow:hidden;transition:max-height .35s ease}
-.hist-detail.open{max-height:400px}
-
-/* ─── PILL FILTER ─── */
-.pill-toggle{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px}
-.pill-toggle::-webkit-scrollbar{display:none}
-.pill-opt{
-  flex-shrink:0;padding:7px 16px;border-radius:20px;
-  border:1px solid var(--border);background:transparent;
-  color:var(--text2);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;
-  transition:all .2s;
-}
-.pill-opt.active{background:var(--orange);color:#fff;border-color:var(--orange);box-shadow:0 4px 12px rgba(255,107,43,.3)}
-
-/* ─── TIMER BUBBLE ─── */
-.timer-bubble{
-  position:fixed;bottom:110px;left:50%;transform:translateX(-50%) translateY(20px);
-  background:rgba(10,7,5,0.95);backdrop-filter:blur(24px);
-  border:1px solid rgba(255,107,43,.3);border-radius:22px;
-  padding:14px 18px;z-index:100;text-align:center;min-width:200px;
-  opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;
-  box-shadow:0 20px 50px rgba(0,0,0,.6),0 0 0 1px rgba(255,107,43,.08);
-}
-.timer-bubble.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:all}
-.timer-time{font-family:'DM Mono',monospace;font-size:32px;font-weight:500;color:var(--orange)}
-.timer-time.warn{color:var(--red)}
-.timer-presets{display:flex;gap:6px;justify-content:center;margin-top:10px}
-.timer-p{background:rgba(255,107,43,.08);border:1px solid rgba(255,107,43,.15);border-radius:10px;color:var(--orange3);font-family:'DM Mono',monospace;font-size:11px;padding:5px 10px;cursor:pointer}
-.timer-acts{display:flex;gap:8px;margin-top:10px}
-.t-pause,.t-close{flex:1;padding:8px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:12px;cursor:pointer;font-family:'DM Mono',monospace}
-
-/* ─── TOAST ─── */
-.toast{
-  position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(10px);
-  background:rgba(19,14,10,0.95);backdrop-filter:blur(20px);
-  border:1px solid var(--border2);border-radius:14px;
-  padding:10px 20px;font-size:14px;font-weight:700;
-  opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;z-index:200;
-  white-space:nowrap;color:var(--text);
-}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.green{border-color:rgba(48,209,88,.3);color:var(--green)}
-.toast.orange{border-color:rgba(255,107,43,.4);color:var(--orange)}
-
-/* ─── MODAL ─── */
-.modal-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(12px);
-  z-index:80;display:flex;align-items:flex-end;justify-content:center;
-  opacity:0;pointer-events:none;transition:opacity .3s;
-}
-.modal-overlay.open{opacity:1;pointer-events:all}
-.modal-sheet{
-  width:100%;max-width:430px;
-  background:var(--surface);
-  border:1px solid var(--border2);
-  border-radius:26px 26px 0 0;padding:24px 18px 40px;
-  transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);
-  max-height:85vh;overflow-y:auto;
-}
-.modal-overlay.open .modal-sheet{transform:translateY(0)}
-.sheet-handle{width:36px;height:3px;background:rgba(255,107,43,.25);border-radius:2px;margin:0 auto 20px}
-.sheet-title{font-size:22px;font-weight:800;margin-bottom:18px;letter-spacing:-.3px}
-
-/* ─── EMPTY ─── */
-.empty{text-align:center;padding:48px 20px;color:var(--text3)}
-.empty-icon{font-size:40px;margin-bottom:10px;opacity:.5}
-.empty-txt{font-size:14px;font-family:'DM Mono',monospace}
-
-/* ─── PR CARD ─── */
-.pr-card{
-  background:var(--surface);border:1px solid var(--border);border-left:2px solid var(--orange);
-  border-radius:var(--rs);padding:14px;margin-bottom:8px;
-  display:flex;justify-content:space-between;align-items:center;
-}
-.pr-name{font-size:14px;color:var(--text2);font-weight:600}
-.pr-val{font-size:22px;font-weight:800;color:var(--orange)}
-.pr-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);margin-top:2px}
 </style>
 </head>
 <body>
+<div class="app" id="app">
 
-<!-- SPLASH -->
-<div id="splash">
-  <div class="splash-logo">IRONLOG</div>
-  <div class="splash-line"></div>
-  <div class="splash-sub">TRACK · LIFT · PROGRESS</div>
-</div>
+  <div class="glow"></div>
 
-<div class="app">
+  <div class="rings">
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div class="ring"></div>
+  </div>
 
-  <!-- HERO CARD -->
-  <div class="hero-wrap">
-    <div class="hero" id="hero">
-      <div class="hero-blob hero-blob1" id="heroBlob1"></div>
-      <div class="hero-blob hero-blob2" id="heroBlob2"></div>
-      <div class="hero-top">
-        <div class="hero-logo">IL</div>
-        <div>
-          <div class="hero-time" id="heroTime"></div>
+  <!-- MENU OVERLAY -->
+  <div class="menu-overlay" id="menuOverlay">
+    <div class="close-area" id="closeArea"></div>
+
+    <!-- Courbe décorative SVG -->
+    <svg class="menu-curve" viewBox="0 0 200 800" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M160 0 Q60 400 160 800" stroke="rgba(0,0,0,0.06)" stroke-width="1" fill="none"/>
+    </svg>
+
+    <div class="menu-items" id="menuItems">
+
+      <div class="menu-item" data-index="0">
+        <div class="item-label-wrap">
+          <span class="item-label">Habitudes</span>
+          <div class="active-pill"></div>
         </div>
+        <div class="item-icon">🌱</div>
       </div>
-      <div class="hero-body" id="heroBody"></div>
+
+      <div class="menu-item" data-index="1">
+        <div class="item-label-wrap">
+          <span class="item-label">Sommeil</span>
+          <div class="active-pill"></div>
+        </div>
+        <div class="item-icon">🌙</div>
+      </div>
+
+      <div class="menu-item" data-index="2">
+        <div class="item-label-wrap">
+          <span class="item-label">Sport</span>
+          <div class="active-pill"></div>
+        </div>
+        <div class="item-icon">⚡</div>
+      </div>
+
+      <div class="menu-item" data-index="3">
+        <div class="item-label-wrap">
+          <span class="item-label">Réflexion</span>
+          <div class="active-pill"></div>
+        </div>
+        <div class="item-icon">✦</div>
+      </div>
+
     </div>
   </div>
 
-  <!-- SCROLL AREA -->
-  <div class="scroll-area" id="scrollArea">
-
-    <!-- HOME -->
-    <div class="page active" id="page-home">
-      <div class="sect">Actions rapides</div>
-      <div class="action-group">
-        <div class="action-row" onclick="openNewSession()">
-          <div class="action-icon ic-orange">🏋️</div>
-          <div class="action-text">
-            <div class="action-label">Nouvelle séance</div>
-            <div class="action-sub">Loguer un entraînement</div>
-          </div>
-          <span class="action-arrow">›</span>
-        </div>
-        <div class="action-row" onclick="logWeight()">
-          <div class="action-icon ic-blue">⚖️</div>
-          <div class="action-text">
-            <div class="action-label">Enregistrer le poids</div>
-            <div class="action-sub">Suivi corporel</div>
-          </div>
-          <span class="action-arrow">›</span>
-        </div>
-        <div class="action-row" onclick="startTimer(90)">
-          <div class="action-icon ic-warm">⏱</div>
-          <div class="action-text">
-            <div class="action-label">Timer de repos</div>
-            <div class="action-sub">Minuteur inter-séries</div>
-          </div>
-          <span class="action-arrow">›</span>
-        </div>
-      </div>
-      <div class="sect">Dernières séances</div>
-      <div id="homeRecentSessions"></div>
-    </div>
-
-    <!-- LOG -->
-    <div class="page" id="page-log">
-      <div class="inp-wrap">
-        <label class="form-label">NOM DE LA SÉANCE</label>
-        <input class="inp" id="sName" placeholder="Push Day A" />
-      </div>
-      <div class="inp-row">
-        <div class="inp-wrap">
-          <label class="form-label">TYPE</label>
-          <select class="inp" id="sType">
-            <option value="push">Push</option>
-            <option value="pull">Pull</option>
-            <option value="legs">Legs</option>
-            <option value="upper">Upper Body</option>
-            <option value="lower">Lower Body</option>
-            <option value="full">Full Body</option>
-          </select>
-        </div>
-        <div class="inp-wrap">
-          <label class="form-label">DATE</label>
-          <input class="inp" type="date" id="sDate" />
-        </div>
-      </div>
-      <div class="inp-row">
-        <div class="inp-wrap">
-          <label class="form-label">DURÉE (MIN)</label>
-          <input class="inp" type="number" id="sDuration" placeholder="60" />
-        </div>
-        <div class="inp-wrap">
-          <label class="form-label">RPE : <span id="rpeVal" style="color:var(--orange)">7</span></label>
-          <div class="rpe-row" style="margin-top:14px">
-            <input type="range" id="sRpe" min="1" max="10" value="7" />
-          </div>
-        </div>
-      </div>
-      <div class="inp-wrap">
-        <label class="form-label">RESSENTI</label>
-        <div class="stars" id="starsRow">
-          <span class="star" data-v="1">★</span><span class="star" data-v="2">★</span>
-          <span class="star" data-v="3">★</span><span class="star" data-v="4">★</span>
-          <span class="star" data-v="5">★</span>
-        </div>
-      </div>
-      <div class="inp-wrap">
-        <label class="form-label">NOTES</label>
-        <textarea class="inp" id="sNotes" placeholder="Sommeil, nutrition, énergie..."></textarea>
-      </div>
-      <div class="sect">Exercices</div>
-      <div id="exContainer"></div>
-      <div style="display:flex;gap:8px;margin-bottom:16px">
-        <button class="btn-sm" onclick="addEx()">＋ Exercice</button>
-        <button class="btn-sm" onclick="startTimer(90)">⏱ Repos</button>
-      </div>
-      <button class="btn btn-primary" onclick="saveSession()" style="margin-bottom:8px">Sauvegarder la séance</button>
-      <button class="btn btn-ghost" onclick="resetForm()">Annuler</button>
-    </div>
-
-    <!-- HISTORIQUE -->
-    <div class="page" id="page-history">
-      <div class="pill-toggle" id="histFilter">
-        <button class="pill-opt active" data-f="all">Tout</button>
-        <button class="pill-opt" data-f="push">Push</button>
-        <button class="pill-opt" data-f="pull">Pull</button>
-        <button class="pill-opt" data-f="legs">Legs</button>
-        <button class="pill-opt" data-f="full">Full</button>
-      </div>
-      <div id="histList"></div>
-      <div style="display:flex;gap:8px;margin-top:4px;margin-bottom:16px">
-        <button class="btn-sm" onclick="exportJSON()">⬇ JSON</button>
-        <button class="btn-sm" onclick="exportCSV()">⬇ CSV</button>
-        <button class="btn-sm" onclick="document.getElementById('importFile').click()">⬆ Import</button>
-        <input type="file" id="importFile" style="display:none" accept=".json" onchange="handleImport(event)"/>
-      </div>
-    </div>
-
-  </div><!-- /scroll-area -->
-
-  <!-- BOTTOM NAV -->
-  <div class="bottom-nav">
-    <div class="nav-pill">
-      <button class="nav-item active" onclick="goPage('home',this)">
-        <span class="nav-icon">⊞</span><span class="nav-label">HOME</span>
-      </button>
-      <button class="nav-item" onclick="goPage('log',this)">
-        <span class="nav-icon">＋</span><span class="nav-label">SÉANCE</span>
-      </button>
-      <button class="nav-item" onclick="goPage('history',this)">
-        <span class="nav-icon">📁</span><span class="nav-label">HISTO</span>
-      </button>
-    </div>
+  <!-- SPHERE -->
+  <div class="sphere-wrap" id="wrap">
+    <canvas id="c" width="480" height="480"></canvas>
   </div>
-</div>
 
-<!-- TIMER -->
-<div class="timer-bubble" id="timerBubble">
-  <div class="timer-time" id="timerDisp">01:30</div>
-  <div class="timer-presets">
-    <button class="timer-p" onclick="setTimer(60)">1min</button>
-    <button class="timer-p" onclick="setTimer(90)">1:30</button>
-    <button class="timer-p" onclick="setTimer(120)">2min</button>
-    <button class="timer-p" onclick="setTimer(180)">3min</button>
-  </div>
-  <div class="timer-acts">
-    <button class="t-pause" onclick="toggleTimer()">⏸ Pause</button>
-    <button class="t-close" onclick="closeTimer()">✕ Fermer</button>
-  </div>
-</div>
+  <div class="hint">appuie pour explorer</div>
+  <div class="status"><div class="dot"></div>Agent actif</div>
 
-<div class="toast" id="toast"></div>
-
-<!-- MODAL SESSION DETAIL -->
-<div class="modal-overlay" id="sessionModal">
-  <div class="modal-sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-title" id="smTitle"></div>
-    <div id="smBody"></div>
-    <div style="margin-top:16px;display:flex;gap:8px">
-      <button class="btn btn-danger" id="smDelBtn">Supprimer</button>
-      <button class="btn btn-ghost" onclick="closeSessionModal()">Fermer</button>
-    </div>
-  </div>
 </div>
 
 <script>
-// ══════════════════════════════
-//  STATE
-// ══════════════════════════════
-let sessions  = JSON.parse(localStorage.getItem('il_sessions')  || '[]');
-let weights   = JSON.parse(localStorage.getItem('il_weights')   || '[]');
-let starRating = 3;
-let exCount = 0;
-let setCount = 0;
-let editingSessionId = null;
-let timerSec = 90, timerOn = false, timerIval = null;
-let histFilter = 'all';
-const TODAY = new Date().toISOString().split('T')[0];
-let currentPage = 'home';
+/* ══════════════════════════════════════
+   SPHERE CANVAS
+══════════════════════════════════════ */
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const W = 480, H = 480, CX = W/2, CY = H/2, BASE_R = 182;
 
-// ══════════════════════════════
-//  HERO CONFIGS
-// ══════════════════════════════
-const HERO_CONFIGS = {
-  home: {
-    from: '#3d1500', to: '#7a2e00',
-    blob1: '#ff6b2b', blob2: '#c44a00',
-    render() {
-      const streak = calcStreak();
-      const weekS = sessions.filter(s => (new Date()-new Date(s.date)) < 7*86400000).length;
-      const lastW = weights[weights.length-1];
-      const hour = new Date().getHours();
-      const greeting = hour < 12 ? 'BONJOUR' : hour < 18 ? 'BON APRÈS-MIDI' : 'BONSOIR';
-      return `
-        <div class="hero-greeting">${greeting}</div>
-        <div class="hero-title">Prêt à<br>tout déchirer ?</div>
-        <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
-          <div class="hero-stat-pill">
-            <span class="hero-stat-val" style="color:#ffd60a">${streak}🔥</span>
-            <span class="hero-stat-label">STREAK</span>
-          </div>
-          <div class="hero-stat-pill">
-            <span class="hero-stat-val">${weekS}</span>
-            <span class="hero-stat-label">/ 7 JOURS</span>
-          </div>
-          ${lastW ? `<div class="hero-stat-pill"><span class="hero-stat-val">${lastW.val}kg</span><span class="hero-stat-label">POIDS</span></div>` : ''}
-        </div>`;
-    }
-  },
-  log: {
-    from: '#0f1e14', to: '#1e3a20',
-    blob1: '#30d158', blob2: '#1a6b30',
-    render() {
-      const name = editingSessionId ? 'Modifier séance' : 'Nouvelle séance';
-      return `
-        <div class="hero-greeting">SESSION</div>
-        <div class="hero-title">${name}</div>
-        <div class="hero-sub">Loguer · Analyser · Progresser</div>`;
-    }
-  },
-  history: {
-    from: '#1a0f00', to: '#3a2200',
-    blob1: '#ff8c55', blob2: '#7a3a00',
-    render() {
-      const total = sessions.length;
-      const totalVol = sessions.reduce((a,s)=>a+exVol(s),0);
-      return `
-        <div class="hero-greeting">HISTORIQUE</div>
-        <div class="hero-title">${total} séance${total>1?'s':''}</div>
-        <div style="display:flex;gap:8px;margin-top:14px">
-          <div class="hero-stat-pill">
-            <span class="hero-stat-val">${fNum(totalVol)}</span>
-            <span class="hero-stat-label">KG SOULEVÉS</span>
-          </div>
-        </div>`;
-    }
-  }
-};
+let t = 0;
 
-// ══════════════════════════════
-//  HERO RENDER
-// ══════════════════════════════
-function renderHero(page) {
-  const cfg = HERO_CONFIGS[page];
-  if (!cfg) return;
-  const hero = document.getElementById('hero');
-  hero.style.background = `linear-gradient(160deg,${cfg.from},${cfg.to})`;
-  document.getElementById('heroBlob1').style.background = cfg.blob1;
-  document.getElementById('heroBlob2').style.background = cfg.blob2;
-  document.getElementById('heroBody').innerHTML = cfg.render();
-  const now = new Date();
-  document.getElementById('heroTime').textContent = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+const waves = [
+  { freq:2, amp:7,  speed:0.28, phase:0.0 },
+  { freq:3, amp:5,  speed:0.19, phase:1.1 },
+  { freq:4, amp:4,  speed:0.35, phase:2.4 },
+  { freq:5, amp:3,  speed:0.22, phase:0.7 },
+  { freq:1, amp:6,  speed:0.14, phase:3.1 },
+];
+
+function getR(angle, time) {
+  let r = BASE_R;
+  for (const w of waves)
+    r += Math.sin(angle * w.freq + w.phase + time * w.speed) * w.amp;
+  return r;
 }
 
-// ══════════════════════════════
-//  INIT
-// ══════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    const splash = document.getElementById('splash');
-    splash.classList.add('hide');
-    setTimeout(() => splash.remove(), 600);
-  }, 1800);
+function buildPath(time) {
+  const steps = 256;
+  ctx.beginPath();
+  for (let i = 0; i <= steps; i++) {
+    const a = (i / steps) * Math.PI * 2;
+    const r = getR(a, time);
+    const x = CX + Math.cos(a) * r;
+    const y = CY + Math.sin(a) * r;
+    i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  }
+  ctx.closePath();
+}
 
-  document.getElementById('sDate').value = TODAY;
-  document.getElementById('sRpe').addEventListener('input', e => {
-    document.getElementById('rpeVal').textContent = e.target.value;
-  });
-  document.querySelectorAll('.star').forEach(s => {
-    s.addEventListener('click', () => { starRating = +s.dataset.v; updateStars(); });
-  });
-  document.querySelectorAll('#histFilter .pill-opt').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('#histFilter .pill-opt').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      histFilter = btn.dataset.f;
-      renderHistory();
-    });
-  });
+function draw() {
+  t += 0.008;
+  ctx.clearRect(0,0,W,H);
 
-  addEx();
-  renderHero('home');
-  renderHomeRecent();
-  renderHistory();
-  updateStars();
+  ctx.save();
+  buildPath(t);
+  ctx.clip();
 
-  setInterval(() => {
-    const now = new Date();
-    const el = document.getElementById('heroTime');
-    if (el) el.textContent = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-  }, 60000);
+  const hue = t * 18;
+
+  /* base */
+  const base = ctx.createRadialGradient(CX-30,CY-40,20,CX,CY,BASE_R+20);
+  base.addColorStop(0.0, 'hsl(220,55%,90%)');
+  base.addColorStop(0.35,'hsl(210,65%,82%)');
+  base.addColorStop(0.65,'hsl(200,70%,70%)');
+  base.addColorStop(1.0, 'hsl(230,60%,50%)');
+  ctx.fillStyle = base; ctx.fillRect(0,0,W,H);
+
+  /* iridescence 1 */
+  const irid = ctx.createLinearGradient(
+    CX+Math.cos(t*0.25)*140, CY+Math.sin(t*0.18)*100,
+    CX-Math.cos(t*0.25)*140, CY-Math.sin(t*0.18)*100
+  );
+  irid.addColorStop(0.0,  `hsla(${270+hue},75%,65%,0.55)`);
+  irid.addColorStop(0.2,  `hsla(${195+hue},85%,68%,0.50)`);
+  irid.addColorStop(0.42, `hsla(${160+hue},70%,65%,0.40)`);
+  irid.addColorStop(0.58, `hsla(${210+hue},80%,70%,0.45)`);
+  irid.addColorStop(0.78, `hsla(${300+hue},65%,62%,0.50)`);
+  irid.addColorStop(1.0,  `hsla(${50+hue}, 85%,68%,0.40)`);
+  ctx.fillStyle = irid; ctx.fillRect(0,0,W,H);
+
+  /* iridescence 2 */
+  const irid2 = ctx.createLinearGradient(
+    CX+Math.sin(t*0.3)*100, CY-Math.cos(t*0.22)*120,
+    CX-Math.sin(t*0.3)*100, CY+Math.cos(t*0.22)*120
+  );
+  irid2.addColorStop(0.0, `hsla(${340+hue},80%,70%,0.30)`);
+  irid2.addColorStop(0.5, `hsla(${175+hue},75%,65%,0.20)`);
+  irid2.addColorStop(1.0, `hsla(${260+hue},70%,60%,0.28)`);
+  ctx.fillStyle = irid2; ctx.fillRect(0,0,W,H);
+
+  /* reflet principal */
+  const spec = ctx.createRadialGradient(CX-65,CY-70,4,CX-50,CY-55,100);
+  spec.addColorStop(0.0,'rgba(255,255,255,0.82)');
+  spec.addColorStop(0.3,'rgba(240,245,255,0.45)');
+  spec.addColorStop(0.7,'rgba(220,235,255,0.12)');
+  spec.addColorStop(1.0,'rgba(255,255,255,0)');
+  ctx.fillStyle = spec; ctx.fillRect(0,0,W,H);
+
+  /* reflet secondaire */
+  const spec2 = ctx.createRadialGradient(CX+70,CY+60,2,CX+65,CY+55,55);
+  spec2.addColorStop(0.0,'rgba(255,255,255,0.30)');
+  spec2.addColorStop(1.0,'rgba(255,255,255,0)');
+  ctx.fillStyle = spec2; ctx.fillRect(0,0,W,H);
+
+  /* bord sombre */
+  const edge = ctx.createRadialGradient(CX,CY,BASE_R*0.50,CX,CY,BASE_R+25);
+  edge.addColorStop(0.0,'rgba(0,0,0,0)');
+  edge.addColorStop(0.6,'rgba(10,15,50,0.05)');
+  edge.addColorStop(0.85,'rgba(10,10,60,0.20)');
+  edge.addColorStop(1.0,'rgba(5,5,40,0.52)');
+  ctx.fillStyle = edge; ctx.fillRect(0,0,W,H);
+
+  /* tache huile */
+  const oil = ctx.createRadialGradient(
+    CX+Math.cos(t*0.4)*60, CY+Math.sin(t*0.55)*50, 5,
+    CX+Math.cos(t*0.4)*60, CY+Math.sin(t*0.55)*50, 90
+  );
+  oil.addColorStop(0.0, `hsla(${40+hue},100%,72%,0.28)`);
+  oil.addColorStop(0.5, `hsla(${170+hue},90%,65%,0.14)`);
+  oil.addColorStop(1.0, 'rgba(0,0,0,0)');
+  ctx.fillStyle = oil; ctx.fillRect(0,0,W,H);
+
+  ctx.restore();
+
+  buildPath(t);
+  ctx.strokeStyle = 'rgba(150,170,220,0.18)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  requestAnimationFrame(draw);
+}
+draw();
+
+/* ══════════════════════════════════════
+   MENU LOGIC
+══════════════════════════════════════ */
+const app        = document.getElementById('app');
+const wrap       = document.getElementById('wrap');
+const closeArea  = document.getElementById('closeArea');
+const items      = document.querySelectorAll('.menu-item');
+
+let menuOpen = false;
+let activeIndex = -1;
+
+function openMenu() {
+  if (menuOpen) return;
+  menuOpen = true;
+  app.classList.add('menu-open');
+}
+
+function closeMenu() {
+  if (!menuOpen) return;
+  menuOpen = false;
+  app.classList.remove('menu-open');
+}
+
+wrap.addEventListener('click', () => {
+  if (menuOpen) closeMenu();
+  else openMenu();
 });
 
-// ══════════════════════════════
-//  NAVIGATION
-// ══════════════════════════════
-function goPage(id, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('scrollArea').scrollTop = 0;
-  currentPage = id;
-  renderHero(id);
-  if (id === 'home')    renderHomeRecent();
-  if (id === 'history') renderHistory();
-}
+closeArea.addEventListener('click', closeMenu);
 
-function openNewSession() {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-log').classList.add('active');
-  document.querySelectorAll('.nav-item').forEach((b,i) => b.classList.toggle('active', i===1));
-  currentPage = 'log';
-  renderHero('log');
-}
-
-// ══════════════════════════════
-//  HOME RECENT
-// ══════════════════════════════
-function renderHomeRecent() {
-  const el = document.getElementById('homeRecentSessions');
-  if (!sessions.length) {
-    el.innerHTML = '<div class="empty"><div class="empty-icon">🏋️</div><div class="empty-txt">Lance ta première séance !</div></div>';
-    return;
-  }
-  el.innerHTML = sessions.slice(0,4).map(s => {
-    const vol = exVol(s);
-    return `<div class="action-row" style="margin-bottom:8px" onclick="openSessionModal(${s.id})">
-      <div class="action-icon ic-orange">${typeEmoji(s.type)}</div>
-      <div class="action-text">
-        <div class="action-label">${s.name}</div>
-        <div class="action-sub">${fDate(s.date)} · ${s.duration||'?'}min · ${fNum(vol)}kg</div>
-      </div>
-      <span class="tag tag-${s.type}">${tName(s.type)}</span>
-    </div>`;
-  }).join('');
-}
-
-function typeEmoji(t) {
-  return {push:'💪',pull:'🔙',legs:'🦵',upper:'🙌',lower:'🏃',full:'⚡'}[t]||'🏋️';
-}
-
-// ══════════════════════════════
-//  STREAK
-// ══════════════════════════════
-function calcStreak() {
-  if (!sessions.length) return 0;
-  const dates = [...new Set(sessions.map(s=>s.date))].sort().reverse();
-  let streak = 0;
-  let current = new Date(TODAY);
-  for (let i = 0; i < dates.length; i++) {
-    const d = new Date(dates[i]+'T00:00:00');
-    const diff = Math.round((current-d)/86400000);
-    if (diff===0||diff===1) { streak++; current = new Date(d-86400000); }
-    else break;
-  }
-  return streak;
-}
-
-// ══════════════════════════════
-//  SESSION LOG
-// ══════════════════════════════
-function addEx(name='') {
-  exCount++;
-  const id = 'ex'+exCount;
-  const div = document.createElement('div');
-  div.className='ex-card'; div.id=id;
-  div.innerHTML=`
-    <div class="ex-head">
-      <span class="ex-num">#${exCount}</span>
-      <input class="ex-name-inp" placeholder="Nom de l'exercice" value="${name}" />
-      <button class="ex-del-btn" onclick="document.getElementById('${id}').remove()">×</button>
-    </div>
-    <div class="sets-header">
-      <span>SÉR</span><span>KG</span><span>REPS</span><span>✓</span>
-    </div>
-    <div class="sets-body" id="sb${id}"></div>
-    <div class="ex-footer">
-      <button class="btn-sm" onclick="addSet('sb${id}')">＋ Série</button>
-      <button class="btn-sm" onclick="startTimer(90)">⏱</button>
-    </div>`;
-  document.getElementById('exContainer').appendChild(div);
-  addSet('sb'+id); addSet('sb'+id); addSet('sb'+id);
-}
-
-function addSet(sbId) {
-  setCount++;
-  const sb = document.getElementById(sbId);
-  const n = sb.children.length+1;
-  const prevW = sb.querySelectorAll('.sw');
-  const prevR = sb.querySelectorAll('.sr');
-  const row = document.createElement('div');
-  row.className='set-row';
-  row.innerHTML=`
-    <span class="set-idx">${n}</span>
-    <input type="number" class="set-inp sw" placeholder="0" value="${prevW.length?prevW[prevW.length-1].value:''}" step="0.5" min="0"/>
-    <input type="number" class="set-inp sr" placeholder="0" value="${prevR.length?prevR[prevR.length-1].value:''}" min="0"/>
-    <input type="checkbox" class="set-check" onchange="this.closest('.set-row').classList.toggle('done-row',this.checked)"/>`;
-  sb.appendChild(row);
-}
-
-function updateStars() {
-  document.querySelectorAll('.star').forEach(s => s.classList.toggle('on', +s.dataset.v<=starRating));
-}
-
-function saveSession() {
-  const name = document.getElementById('sName').value.trim()||'Séance';
-  const type = document.getElementById('sType').value;
-  const date = document.getElementById('sDate').value||TODAY;
-  const duration = +document.getElementById('sDuration').value||0;
-  const notes = document.getElementById('sNotes').value;
-  const rpe = +document.getElementById('sRpe').value;
-  const exercises = [];
-  document.querySelectorAll('.ex-card').forEach(card => {
-    const exName = card.querySelector('.ex-name-inp').value.trim();
-    if (!exName) return;
-    const sets = [];
-    card.querySelectorAll('.set-row').forEach(row => {
-      const w = +row.querySelector('.sw')?.value||0;
-      const r = +row.querySelector('.sr')?.value||0;
-      sets.push({weight:w,reps:r});
-    });
-    exercises.push({name:exName,sets});
-  });
-  if (!exercises.length) { showToast('Ajoute au moins un exercice !',''); return; }
-  const id = editingSessionId||Date.now();
-  const session = {id,name,type,date,duration,notes,rpe,rating:starRating,exercises};
-  detectPRs(session);
-  if (editingSessionId) {
-    const idx = sessions.findIndex(s=>s.id===editingSessionId);
-    if (idx!==-1) sessions[idx]=session;
-  } else {
-    sessions.unshift(session);
-  }
-  editingSessionId=null;
-  save();
-  resetForm();
-  goPage('home', document.querySelectorAll('.nav-item')[0]);
-  showToast('✅ Séance sauvegardée !','green');
-}
-
-function detectPRs(session) {
-  session.exercises.forEach(ex => {
-    const maxW = Math.max(...ex.sets.map(s=>s.weight));
-    const prevMax = Math.max(0,...sessions
-      .filter(s=>s.id!==session.id)
-      .flatMap(s=>s.exercises.filter(e=>e.name.toLowerCase()===ex.name.toLowerCase()))
-      .flatMap(e=>e.sets.map(s=>s.weight)));
-    if (maxW>0 && maxW>prevMax) showToast(`🏆 PR ! ${ex.name} ${maxW}kg`,'orange');
-  });
-}
-
-function editSession(id) {
-  const s = sessions.find(s=>s.id===id);
-  if (!s) return;
-  closeSessionModal();
-  openNewSession();
-  editingSessionId = id;
-  document.getElementById('sName').value = s.name;
-  document.getElementById('sType').value = s.type;
-  document.getElementById('sDate').value = s.date;
-  document.getElementById('sDuration').value = s.duration;
-  document.getElementById('sNotes').value = s.notes||'';
-  document.getElementById('sRpe').value = s.rpe||7;
-  document.getElementById('rpeVal').textContent = s.rpe||7;
-  starRating = s.rating||3; updateStars();
-  document.getElementById('exContainer').innerHTML='';
-  exCount=0;
-  s.exercises.forEach(ex => {
-    addEx(ex.name);
-    const sbId='sbex'+exCount;
-    document.getElementById(sbId).innerHTML='';
-    ex.sets.forEach(set => {
-      addSet(sbId);
-      const rows=document.getElementById(sbId).querySelectorAll('.set-row');
-      const last=rows[rows.length-1];
-      last.querySelector('.sw').value=set.weight;
-      last.querySelector('.sr').value=set.reps;
-    });
-  });
-  renderHero('log');
-}
-
-function resetForm() {
-  editingSessionId=null;
-  document.getElementById('sName').value='';
-  document.getElementById('sDuration').value='';
-  document.getElementById('sNotes').value='';
-  document.getElementById('sDate').value=TODAY;
-  document.getElementById('sRpe').value=7;
-  document.getElementById('rpeVal').textContent='7';
-  starRating=3; updateStars();
-  document.getElementById('exContainer').innerHTML='';
-  exCount=0; addEx();
-}
-
-// ══════════════════════════════
-//  HISTORY
-// ══════════════════════════════
-function renderHistory(){
-  const filtered=histFilter==='all'?sessions:sessions.filter(s=>s.type===histFilter);
-  if(!filtered.length){
-    document.getElementById('histList').innerHTML='<div class="empty"><div class="empty-icon">📭</div><div class="empty-txt">Aucune séance trouvée</div></div>';
-    return;
-  }
-  document.getElementById('histList').innerHTML=filtered.map(s=>{
-    const vol=exVol(s);
-    return `<div class="hist-item" onclick="toggleHistDetail(${s.id})">
-      <div class="hist-top">
-        <div>
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-            <span class="tag tag-${s.type}">${tName(s.type)}</span>
-            <span style="font-size:11px;color:var(--text3);font-family:'DM Mono'">${s.duration||'?'}min</span>
-          </div>
-          <div class="hist-title">${s.name}</div>
-        </div>
-        <div style="text-align:right">
-          <div class="hist-date">${fDate(s.date)}</div>
-          <div style="color:var(--yellow);margin-top:4px;font-size:13px">${'★'.repeat(s.rating||0)}</div>
-        </div>
-      </div>
-      <div class="hist-meta">${s.exercises.length} exercice(s) · ${fNum(vol)}kg · RPE ${s.rpe||'?'}</div>
-      <div class="hist-detail" id="hd${s.id}">
-        ${s.notes?`<div style="font-size:12px;color:var(--text2);margin:10px 0;padding:8px;background:rgba(255,107,43,.05);border-radius:8px;border-left:2px solid var(--orange)">📝 ${s.notes}</div>`:''}
-        ${s.exercises.map(ex=>`
-          <div style="margin-bottom:10px;margin-top:10px">
-            <div style="font-weight:700;font-size:14px;margin-bottom:5px">${ex.name}</div>
-            <div style="display:flex;gap:5px;flex-wrap:wrap">
-              ${ex.sets.map(set=>`<span style="font-family:'DM Mono';font-size:11px;padding:3px 8px;background:rgba(255,107,43,.08);border:1px solid rgba(255,107,43,.12);border-radius:6px;color:var(--orange3)">${set.weight}kg×${set.reps}</span>`).join('')}
-            </div>
-          </div>`).join('')}
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <button class="btn-sm" onclick="event.stopPropagation();editSession(${s.id})">✏️ Modifier</button>
-          <button class="btn-sm" style="color:var(--red);border-color:rgba(255,69,58,.2)" onclick="event.stopPropagation();deleteSession(${s.id})">Supprimer</button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function toggleHistDetail(id){document.getElementById('hd'+id)?.classList.toggle('open')}
-function deleteSession(id){
-  if(!confirm('Supprimer ?'))return;
-  sessions=sessions.filter(s=>s.id!==id);
-  save();renderHistory();renderHero(currentPage);
-  showToast('Séance supprimée','');
-}
-
-// ══════════════════════════════
-//  SESSION MODAL
-// ══════════════════════════════
-function openSessionModal(id){
-  const s=sessions.find(s=>s.id===id);
-  if(!s)return;
-  document.getElementById('smTitle').textContent=s.name;
-  document.getElementById('smBody').innerHTML=`
-    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
-      <span class="tag tag-${s.type}">${tName(s.type)}</span>
-      <span style="font-family:'DM Mono';font-size:11px;color:var(--text3)">${fDate(s.date)}</span>
-      <span style="font-family:'DM Mono';font-size:11px;color:var(--text3)">${s.duration||'?'}min</span>
-      <span style="color:var(--yellow)">${'★'.repeat(s.rating||0)}</span>
-    </div>
-    ${s.notes?`<div style="font-size:13px;color:var(--text2);padding:10px;background:rgba(255,107,43,.05);border-radius:10px;border-left:2px solid var(--orange);margin-bottom:12px">📝 ${s.notes}</div>`:''}
-    ${s.exercises.map(ex=>`
-      <div style="margin-bottom:12px">
-        <div style="font-weight:700;font-size:15px;margin-bottom:6px">${ex.name}</div>
-        <div style="display:flex;gap:5px;flex-wrap:wrap">
-          ${ex.sets.map(set=>`<span style="font-family:'DM Mono';font-size:12px;padding:4px 10px;background:rgba(255,107,43,.08);border:1px solid rgba(255,107,43,.15);border-radius:8px;color:var(--orange3)">${set.weight}kg × ${set.reps}</span>`).join('')}
-        </div>
-      </div>`).join('')}`;
-  document.getElementById('smDelBtn').onclick=()=>{deleteSession(id);closeSessionModal();};
-  document.getElementById('sessionModal').classList.add('open');
-}
-function closeSessionModal(){document.getElementById('sessionModal').classList.remove('open')}
-document.getElementById('sessionModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeSessionModal()});
-
-// ══════════════════════════════
-//  WEIGHT
-// ══════════════════════════════
-function logWeight(){
-  const val=prompt('Ton poids aujourd\'hui (kg) ?');
-  if(!val||isNaN(+val))return;
-  weights.push({date:TODAY,val:+val});
-  save();renderHero(currentPage);
-  showToast('✅ Poids enregistré','green');
-}
-
-// ══════════════════════════════
-//  TIMER
-// ══════════════════════════════
-function startTimer(s){
-  timerSec=s;timerOn=true;
-  document.getElementById('timerBubble').classList.add('show');
-  clearInterval(timerIval);
-  updateTimerDisp();
-  timerIval=setInterval(()=>{
-    if(timerOn){
-      timerSec--;updateTimerDisp();
-      if(timerSec<=0){clearInterval(timerIval);timerOn=false;showToast('⏱ Fin du repos !','orange');}
+items.forEach((item, i) => {
+  item.addEventListener('click', (e) => {
+    e.stopPropagation();
+    items.forEach(it => it.classList.remove('active'));
+    if (activeIndex === i) {
+      activeIndex = -1;
+    } else {
+      activeIndex = i;
+      item.classList.add('active');
     }
-  },1000);
-}
-function setTimer(s){clearInterval(timerIval);startTimer(s);}
-function toggleTimer(){timerOn=!timerOn;}
-function closeTimer(){clearInterval(timerIval);timerOn=false;document.getElementById('timerBubble').classList.remove('show');}
-function updateTimerDisp(){
-  const m=Math.floor(timerSec/60),s=timerSec%60;
-  const el=document.getElementById('timerDisp');
-  el.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-  el.classList.toggle('warn',timerSec<=10);
-}
+    setTimeout(closeMenu, 320);
+  });
+});
 
-// ══════════════════════════════
-//  EXPORT / IMPORT
-// ══════════════════════════════
-function exportJSON(){dl(new Blob([JSON.stringify({sessions,weights})],{type:'application/json'}),'ironlog-backup.json')}
-function exportCSV(){
-  const rows=[['Date','Séance','Type','Durée','RPE','Exercice','Série','Poids','Reps']];
-  sessions.forEach(s=>s.exercises.forEach(ex=>ex.sets.forEach((set,i)=>
-    rows.push([s.date,s.name,s.type,s.duration,s.rpe,ex.name,i+1,set.weight,set.reps])
-  )));
-  dl(new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'}),'ironlog-export.csv');
-}
-function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();}
-function handleImport(e){
-  const file=e.target.files[0];if(!file)return;
-  const r=new FileReader();
-  r.onload=ev=>{
-    try{
-      const d=JSON.parse(ev.target.result);
-      if(d.sessions)sessions=[...d.sessions,...sessions];
-      if(d.weights)weights=[...d.weights,...weights];
-      save();renderHomeRecent();renderHistory();
-      showToast('✅ Données importées !','green');
-    }catch{showToast('Fichier invalide','');}
-  };
-  r.readAsText(file);e.target.value='';
-}
-
-// ══════════════════════════════
-//  UTILS
-// ══════════════════════════════
-function save(){
-  localStorage.setItem('il_sessions',JSON.stringify(sessions));
-  localStorage.setItem('il_weights',JSON.stringify(weights));
-}
-function exVol(s){return s.exercises.reduce((a,ex)=>a+ex.sets.reduce((b,set)=>b+set.weight*set.reps,0),0)}
-function fNum(n){return n>=1000?(n/1000).toFixed(1)+'k':Math.round(n)}
-function fDate(d){return new Date(d+'T00:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'})}
-function tName(t){return{push:'Push',pull:'Pull',legs:'Legs',upper:'Upper',lower:'Lower',full:'Full Body'}[t]||t}
-function showToast(msg,type){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.className='toast '+type+' show';
-  clearTimeout(t._t);
-  t._t=setTimeout(()=>t.classList.remove('show'),3000);
-}
+/* Touch / swipe down to close */
+let touchStartY = 0;
+document.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; });
+document.addEventListener('touchend', e => {
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if (dy > 60 && menuOpen) closeMenu();
+});
 </script>
 </body>
 </html>
