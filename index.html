@@ -7,19 +7,19 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap');
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-  html,body{width:100%;height:100%;background:#ebebeb;font-family:'DM Sans',sans-serif;overflow:hidden;}
+  html,body{width:100%;height:100%;background:#000;font-family:'DM Sans',sans-serif;overflow:hidden;}
 
   .app{
     width:100vw;height:100vh;
-    background:#ffffff;
+    background:#000000;
     display:flex;align-items:center;justify-content:center;
     position:relative;overflow:hidden;
   }
 
-  /* ── Lueur ambiante ── */
+  /* ── Lueur ambiante noire ── */
   .glow{
-    position:absolute;width:340px;height:340px;border-radius:50%;
-    background:radial-gradient(circle,rgba(160,180,255,0.08) 0%,transparent 70%);
+    position:absolute;width:360px;height:360px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,255,255,0.04) 0%,transparent 70%);
     animation:glowPulse 5s ease-in-out infinite;pointer-events:none;
     transition:opacity 0.6s;
   }
@@ -31,17 +31,17 @@
   .menu-open .rings{opacity:0;}
   .ring{
     position:absolute;border-radius:50%;
-    border:0.5px solid rgba(150,170,230,0.13);
-    animation:ringOut 4s ease-out infinite;
+    border:0.5px solid rgba(255,255,255,0.06);
+    animation:ringOut 5s ease-out infinite;
     top:50%;left:50%;transform:translate(-50%,-50%);
   }
-  .ring:nth-child(1){width:250px;height:250px;animation-delay:0s;}
-  .ring:nth-child(2){width:310px;height:310px;animation-delay:1.3s;}
-  .ring:nth-child(3){width:380px;height:380px;animation-delay:2.6s;}
+  .ring:nth-child(1){width:260px;height:260px;animation-delay:0s;}
+  .ring:nth-child(2){width:330px;height:330px;animation-delay:1.6s;}
+  .ring:nth-child(3){width:410px;height:410px;animation-delay:3.2s;}
   @keyframes ringOut{
-    0%{opacity:0;transform:translate(-50%,-50%) scale(0.9);}
+    0%{opacity:0;transform:translate(-50%,-50%) scale(0.88);}
     20%{opacity:1;}
-    100%{opacity:0;transform:translate(-50%,-50%) scale(1.1);}
+    100%{opacity:0;transform:translate(-50%,-50%) scale(1.12);}
   }
 
   /* ── Sphère ── */
@@ -49,38 +49,36 @@
     position:absolute;
     left:50%;top:50%;
     transform:translate(-50%,-50%);
-    width:190px;height:190px;
+    width:200px;height:200px;
     cursor:pointer;z-index:20;
     transition:left 0.65s cubic-bezier(0.77,0,0.18,1),
                top 0.65s cubic-bezier(0.77,0,0.18,1),
                transform 0.65s cubic-bezier(0.77,0,0.18,1);
   }
-  /* quand menu ouvert → sphère glisse à gauche */
   .menu-open .sphere-wrap{
     left:22%;top:50%;
     transform:translate(-50%,-50%) scale(0.78);
   }
-  canvas{
-    display:block;width:190px;height:190px;border-radius:50%;
-    filter:drop-shadow(0 14px 34px rgba(80,100,200,0.14)) drop-shadow(0 3px 10px rgba(100,130,220,0.09));
+  canvas#c{
+    display:block;width:200px;height:200px;border-radius:50%;
   }
 
   /* ── Status ── */
   .status{
     position:absolute;bottom:40px;left:50%;transform:translateX(-50%);
     display:flex;align-items:center;gap:7px;
-    font-size:10px;letter-spacing:0.22em;color:rgba(0,0,0,0.18);
+    font-size:10px;letter-spacing:0.22em;color:rgba(255,255,255,0.18);
     text-transform:uppercase;white-space:nowrap;user-select:none;
     transition:opacity 0.4s;
   }
   .menu-open .status{opacity:0;pointer-events:none;}
-  .dot{width:5px;height:5px;border-radius:50%;background:rgba(80,200,140,0.7);animation:blink 2.5s ease-in-out infinite;}
-  @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.15;}}
+  .dot{width:5px;height:5px;border-radius:50%;background:rgba(180,255,200,0.6);animation:blink 2.5s ease-in-out infinite;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.1;}}
 
   /* ── Hint ── */
   .hint{
-    position:absolute;bottom:72px;left:50%;transform:translateX(-50%);
-    font-size:10.5px;color:rgba(0,0,0,0.13);letter-spacing:0.1em;
+    position:absolute;bottom:70px;left:50%;transform:translateX(-50%);
+    font-size:10px;color:rgba(255,255,255,0.1);letter-spacing:0.14em;
     animation:hintFloat 3.5s ease-in-out infinite;pointer-events:none;
     transition:opacity 0.4s;
   }
@@ -91,30 +89,21 @@
      ARC MENU
   ══════════════════════════════════════ */
   .arc-canvas{
-    position:absolute;inset:0;
-    width:100%;height:100%;
-    pointer-events:none;
-    z-index:9;
+    position:absolute;inset:0;width:100%;height:100%;
+    pointer-events:none;z-index:9;
     opacity:0;transition:opacity 0.5s;
   }
   .menu-open .arc-canvas{opacity:1;}
 
-  /* Items positionnés en JS */
   .menu-item{
     position:absolute;
     display:flex;align-items:center;gap:14px;
-    cursor:pointer;
-    opacity:0;
-    transform:scale(0.85);
-    transition:opacity 0.35s,transform 0.35s cubic-bezier(0.34,1.4,0.64,1);
-    z-index:30;
-    user-select:none;
-    pointer-events:none;
+    cursor:pointer;opacity:0;
+    transform:scale(0.85) translateX(10px);
+    transition:opacity 0.35s,transform 0.38s cubic-bezier(0.34,1.4,0.64,1);
+    z-index:30;user-select:none;pointer-events:none;
   }
-  .menu-open .menu-item{
-    opacity:1;transform:scale(1);pointer-events:auto;
-  }
-  /* stagger */
+  .menu-open .menu-item{opacity:1;transform:scale(1) translateX(0);pointer-events:auto;}
   .menu-open .menu-item:nth-child(1){transition-delay:0.04s;}
   .menu-open .menu-item:nth-child(2){transition-delay:0.10s;}
   .menu-open .menu-item:nth-child(3){transition-delay:0.16s;}
@@ -122,36 +111,32 @@
 
   .item-label{
     font-size:19px;font-weight:300;
-    color:rgba(0,0,0,0.22);
+    color:rgba(255,255,255,0.22);
     letter-spacing:-0.01em;
-    transition:color 0.25s,font-weight 0.25s;
-    white-space:nowrap;
+    transition:color 0.25s;white-space:nowrap;
   }
   .menu-item.active .item-label,
-  .menu-item.hovered .item-label{
-    color:rgba(0,0,0,0.72);font-weight:400;
-  }
+  .menu-item.hovered .item-label{color:rgba(255,255,255,0.85);font-weight:400;}
 
   .item-icon{
     width:54px;height:54px;border-radius:50%;
-    background:rgba(0,0,0,0.04);
+    background:rgba(255,255,255,0.05);
     display:flex;align-items:center;justify-content:center;
-    font-size:24px;flex-shrink:0;
-    position:relative;
+    font-size:24px;flex-shrink:0;position:relative;
     transition:transform 0.3s,background 0.3s;
   }
   .menu-item.active .item-icon,
   .menu-item.hovered .item-icon{
-    background:rgba(180,200,255,0.09);
-    transform:scale(1.1);
+    background:rgba(255,255,255,0.09);transform:scale(1.1);
   }
 
-  /* Contour iridescent tournant sur l'item actif */
+  /* Contour blanc néon tournant sur item actif */
   .menu-item.active .item-icon::before{
     content:'';position:absolute;inset:-2.5px;border-radius:50%;
     background:conic-gradient(from 0deg,
-      hsl(270,70%,70%),hsl(200,80%,72%),hsl(160,75%,68%),
-      hsl(50,85%,72%),hsl(310,65%,68%),hsl(270,70%,70%)
+      rgba(255,255,255,0.9),rgba(255,255,255,0.2),
+      rgba(255,255,255,0.9),rgba(255,255,255,0.1),
+      rgba(255,255,255,0.9)
     );
     -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
     mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
@@ -160,11 +145,9 @@
   }
   @keyframes spinBorder{to{transform:rotate(360deg);}}
 
-  /* Pilule noire item actif */
   .active-pill{
-    display:none;
-    width:32px;height:16px;border-radius:20px;
-    background:rgba(0,0,0,0.72);flex-shrink:0;
+    display:none;width:30px;height:14px;border-radius:20px;
+    background:rgba(255,255,255,0.75);flex-shrink:0;
   }
   .menu-item.active .active-pill{display:block;}
 </style>
@@ -177,10 +160,8 @@
     <div class="ring"></div><div class="ring"></div><div class="ring"></div>
   </div>
 
-  <!-- Canvas pour l'arc + rayon lumineux -->
   <canvas class="arc-canvas" id="arcCanvas"></canvas>
 
-  <!-- Items menu (positionnés dynamiquement) -->
   <div class="menu-item" data-index="0" id="item0">
     <span class="item-label">Habitudes</span>
     <div class="item-icon">🌱</div>
@@ -202,7 +183,6 @@
     <div class="active-pill"></div>
   </div>
 
-  <!-- Sphère -->
   <div class="sphere-wrap" id="wrap">
     <canvas id="c" width="480" height="480"></canvas>
   </div>
@@ -213,85 +193,118 @@
 
 <script>
 /* ══════════════════════════════════════
-   SPHERE
+   SPHERE — blanc sur noir, effet neon animé
 ══════════════════════════════════════ */
-const SC = document.getElementById('c');
+const SC   = document.getElementById('c');
 const sctx = SC.getContext('2d');
-const SW=480,SH=480,SCX=SW/2,SCY=SH/2,SR=178;
-let t=0;
+const SW=480,SH=480,SCX=SW/2,SCY=SH/2,SR=175;
+
+let t = 0;
+
+// Légère ondulation de surface — amplitude très faible, forme reste ronde
 const waves=[
-  {freq:2,amp:7,speed:0.28,phase:0.0},
-  {freq:3,amp:5,speed:0.19,phase:1.1},
-  {freq:4,amp:4,speed:0.35,phase:2.4},
-  {freq:5,amp:3,speed:0.22,phase:0.7},
-  {freq:1,amp:6,speed:0.14,phase:3.1},
+  {freq:2,amp:4,speed:0.22,phase:0.0},
+  {freq:3,amp:3,speed:0.15,phase:1.4},
+  {freq:5,amp:2,speed:0.30,phase:2.7},
+  {freq:7,amp:1.5,speed:0.18,phase:0.9},
 ];
+
 function getR(a,time){
   let r=SR;
   for(const w of waves) r+=Math.sin(a*w.freq+w.phase+time*w.speed)*w.amp;
   return r;
 }
-function buildSphere(time){
-  const steps=256;
+
+function buildPath(time){
   sctx.beginPath();
+  const steps=300;
   for(let i=0;i<=steps;i++){
     const a=(i/steps)*Math.PI*2;
     const r=getR(a,time);
-    const x=SCX+Math.cos(a)*r,y=SCY+Math.sin(a)*r;
+    const x=SCX+Math.cos(a)*r, y=SCY+Math.sin(a)*r;
     i===0?sctx.moveTo(x,y):sctx.lineTo(x,y);
   }
   sctx.closePath();
 }
+
+// Point lumineux qui tourne lentement sur la surface → simule un éclairage orbital
 function drawSphere(){
-  t+=0.008;
+  t += 0.007;
   sctx.clearRect(0,0,SW,SH);
+
   sctx.save();
-  buildSphere(t);sctx.clip();
-  const hue=t*18;
-  const base=sctx.createRadialGradient(SCX-30,SCY-40,20,SCX,SCY,SR+20);
-  base.addColorStop(0.0,'hsl(220,55%,90%)');
-  base.addColorStop(0.35,'hsl(210,65%,82%)');
-  base.addColorStop(0.65,'hsl(200,70%,70%)');
-  base.addColorStop(1.0,'hsl(230,60%,50%)');
-  sctx.fillStyle=base;sctx.fillRect(0,0,SW,SH);
-  const ir=sctx.createLinearGradient(SCX+Math.cos(t*0.25)*140,SCY+Math.sin(t*0.18)*100,SCX-Math.cos(t*0.25)*140,SCY-Math.sin(t*0.18)*100);
-  ir.addColorStop(0.0,`hsla(${270+hue},75%,65%,0.55)`);
-  ir.addColorStop(0.2,`hsla(${195+hue},85%,68%,0.50)`);
-  ir.addColorStop(0.42,`hsla(${160+hue},70%,65%,0.40)`);
-  ir.addColorStop(0.58,`hsla(${210+hue},80%,70%,0.45)`);
-  ir.addColorStop(0.78,`hsla(${300+hue},65%,62%,0.50)`);
-  ir.addColorStop(1.0,`hsla(${50+hue},85%,68%,0.40)`);
-  sctx.fillStyle=ir;sctx.fillRect(0,0,SW,SH);
-  const ir2=sctx.createLinearGradient(SCX+Math.sin(t*0.3)*100,SCY-Math.cos(t*0.22)*120,SCX-Math.sin(t*0.3)*100,SCY+Math.cos(t*0.22)*120);
-  ir2.addColorStop(0.0,`hsla(${340+hue},80%,70%,0.30)`);
-  ir2.addColorStop(0.5,`hsla(${175+hue},75%,65%,0.20)`);
-  ir2.addColorStop(1.0,`hsla(${260+hue},70%,60%,0.28)`);
-  sctx.fillStyle=ir2;sctx.fillRect(0,0,SW,SH);
-  const sp=sctx.createRadialGradient(SCX-65,SCY-70,4,SCX-50,SCY-55,100);
-  sp.addColorStop(0.0,'rgba(255,255,255,0.82)');
-  sp.addColorStop(0.3,'rgba(240,245,255,0.45)');
-  sp.addColorStop(0.7,'rgba(220,235,255,0.12)');
-  sp.addColorStop(1.0,'rgba(255,255,255,0)');
-  sctx.fillStyle=sp;sctx.fillRect(0,0,SW,SH);
-  const sp2=sctx.createRadialGradient(SCX+70,SCY+60,2,SCX+65,SCY+55,55);
-  sp2.addColorStop(0.0,'rgba(255,255,255,0.30)');
-  sp2.addColorStop(1.0,'rgba(255,255,255,0)');
-  sctx.fillStyle=sp2;sctx.fillRect(0,0,SW,SH);
-  const ed=sctx.createRadialGradient(SCX,SCY,SR*0.5,SCX,SCY,SR+25);
-  ed.addColorStop(0.0,'rgba(0,0,0,0)');
-  ed.addColorStop(0.6,'rgba(10,15,50,0.05)');
-  ed.addColorStop(0.85,'rgba(10,10,60,0.20)');
-  ed.addColorStop(1.0,'rgba(5,5,40,0.52)');
-  sctx.fillStyle=ed;sctx.fillRect(0,0,SW,SH);
-  const oil=sctx.createRadialGradient(SCX+Math.cos(t*0.4)*60,SCY+Math.sin(t*0.55)*50,5,SCX+Math.cos(t*0.4)*60,SCY+Math.sin(t*0.55)*50,90);
-  oil.addColorStop(0.0,`hsla(${40+hue},100%,72%,0.28)`);
-  oil.addColorStop(0.5,`hsla(${170+hue},90%,65%,0.14)`);
-  oil.addColorStop(1.0,'rgba(0,0,0,0)');
-  sctx.fillStyle=oil;sctx.fillRect(0,0,SW,SH);
+  buildPath(t);
+  sctx.clip();
+
+  // ── Corps principal : sphère blanche texturée ──
+  // Lumière orbitale : source qui tourne autour de la sphère
+  const lx = SCX + Math.cos(t*0.35) * SR * 0.55;
+  const ly = SCY + Math.sin(t*0.35) * SR * 0.42;
+
+  // Gradient de base : gris foncé au centre → blanc sur les bords éclairés
+  const base = sctx.createRadialGradient(lx, ly, 0, SCX, SCY, SR+10);
+  base.addColorStop(0.0,  'rgba(255,255,255,1.0)');  // point le plus éclairé
+  base.addColorStop(0.18, 'rgba(230,230,230,0.98)');
+  base.addColorStop(0.42, 'rgba(160,160,160,0.95)');
+  base.addColorStop(0.70, 'rgba(70,70,70,0.97)');
+  base.addColorStop(0.88, 'rgba(25,25,25,0.98)');
+  base.addColorStop(1.0,  'rgba(8,8,8,1.0)');
+  sctx.fillStyle = base;
+  sctx.fillRect(0,0,SW,SH);
+
+  // ── Texture de grain fin sur la surface ──
+  // Simulée via un gradient radial bruit-like avec second point lumineux
+  const grain = sctx.createRadialGradient(
+    SCX + Math.sin(t*0.6)*30, SCY + Math.cos(t*0.45)*25, SR*0.3,
+    SCX, SCY, SR
+  );
+  grain.addColorStop(0.0, 'rgba(255,255,255,0.06)');
+  grain.addColorStop(0.5, 'rgba(200,200,200,0.03)');
+  grain.addColorStop(1.0, 'rgba(0,0,0,0.12)');
+  sctx.fillStyle = grain;
+  sctx.fillRect(0,0,SW,SH);
+
+  // ── Halo néon blanc animé sur le bord ──
+  // Intensité qui pulse doucement
+  const neonAmp = 0.55 + Math.sin(t*1.1)*0.20 + Math.sin(t*0.7)*0.12;
+  const neon = sctx.createRadialGradient(SCX,SCY,SR*0.72, SCX,SCY,SR+6);
+  neon.addColorStop(0.0, 'rgba(255,255,255,0)');
+  neon.addColorStop(0.7, `rgba(255,255,255,${0.08*neonAmp})`);
+  neon.addColorStop(0.88,`rgba(255,255,255,${0.55*neonAmp})`);
+  neon.addColorStop(0.96,`rgba(255,255,255,${0.80*neonAmp})`);
+  neon.addColorStop(1.0, `rgba(255,255,255,${0.30*neonAmp})`);
+  sctx.fillStyle = neon;
+  sctx.fillRect(0,0,SW,SH);
+
+  // ── Second arc néon décalé (côté opposé) ──
+  const lx2 = SCX - Math.cos(t*0.35) * SR * 0.7;
+  const ly2 = SCY - Math.sin(t*0.35) * SR * 0.55;
+  const neon2 = sctx.createRadialGradient(lx2,ly2,SR*0.5, lx2,ly2,SR*1.1);
+  neon2.addColorStop(0.0,'rgba(255,255,255,0)');
+  neon2.addColorStop(0.7,`rgba(255,255,255,${0.04*neonAmp})`);
+  neon2.addColorStop(1.0,`rgba(255,255,255,${0.18*neonAmp})`);
+  sctx.fillStyle = neon2;
+  sctx.fillRect(0,0,SW,SH);
+
+  // ── Coeur sombre (profondeur) ──
+  const core = sctx.createRadialGradient(SCX,SCY,0,SCX,SCY,SR*0.65);
+  core.addColorStop(0.0,'rgba(0,0,0,0.45)');
+  core.addColorStop(1.0,'rgba(0,0,0,0)');
+  sctx.fillStyle = core;
+  sctx.fillRect(0,0,SW,SH);
+
   sctx.restore();
-  buildSphere(t);
-  sctx.strokeStyle='rgba(150,170,220,0.18)';
-  sctx.lineWidth=1.5;sctx.stroke();
+
+  // ── Contour extérieur néon blanc (hors clip) ──
+  buildPath(t);
+  const neonAmp2 = 0.5 + Math.sin(t*1.1+1)*0.25;
+  sctx.shadowColor = `rgba(255,255,255,${0.55*neonAmp2})`;
+  sctx.shadowBlur  = 18 + Math.sin(t*0.9)*8;
+  sctx.strokeStyle = `rgba(255,255,255,${0.55*neonAmp2})`;
+  sctx.lineWidth   = 1.2;
+  sctx.stroke();
+  sctx.shadowBlur  = 0;
+
   requestAnimationFrame(drawSphere);
 }
 drawSphere();
@@ -299,222 +312,127 @@ drawSphere();
 /* ══════════════════════════════════════
    ARC MENU
 ══════════════════════════════════════ */
-const app      = document.getElementById('app');
-const wrap     = document.getElementById('wrap');
-const arcCv    = document.getElementById('arcCanvas');
-const actx     = arcCv.getContext('2d');
-const itemEls  = document.querySelectorAll('.menu-item');
+const app     = document.getElementById('app');
+const wrap    = document.getElementById('wrap');
+const arcCv   = document.getElementById('arcCanvas');
+const actx    = arcCv.getContext('2d');
+const itemEls = document.querySelectorAll('.menu-item');
 
-let menuOpen   = false;
-let activeIdx  = -1;
-let hoveredIdx = -1;
-let rayTarget  = -1;   // index vers lequel le rayon se dirige
-let rayProgress= 0;    // 0→1 animation du rayon
-let rayActive  = false;
-let pulseT     = 0;
+let menuOpen=false, activeIdx=-1, hoveredIdx=-1;
+let rayTarget=-1, rayProgress=0, pulseT=0;
 
-// Positions arc (calculées en fonction de la taille écran)
-const ITEMS = [
-  { label:'Habitudes', emoji:'🌱' },
-  { label:'Sommeil',   emoji:'🌙' },
-  { label:'Sport',     emoji:'⚡' },
-  { label:'Réflexion', emoji:'✦' },
-];
+const ARC_START = -52*Math.PI/180;
+const ARC_END   =  52*Math.PI/180;
 
-// Paramètres de l'arc : rayon et angles
-// La sphère est à gauche (~22% du viewport width)
-// L'arc part de la sphère et va vers la droite
-
-function resize(){
-  arcCv.width  = window.innerWidth;
-  arcCv.height = window.innerHeight;
-  positionItems();
-}
+function getItemAngle(i){ return ARC_START+(ARC_END-ARC_START)*(i/(itemEls.length-1)); }
 
 function getSphereCenter(){
-  if(!menuOpen){
-    return { x: window.innerWidth/2, y: window.innerHeight/2 };
-  }
-  // sphère ouverte : 22% left, 50% top
-  return { x: window.innerWidth * 0.22, y: window.innerHeight * 0.50 };
-}
-
-// Arc : les options sont réparties sur un arc de cercle
-// dont le centre est approximativement la sphère
-const ARC_R      = Math.min(window.innerWidth, window.innerHeight) * 0.44;
-const ARC_START  = -52 * Math.PI/180;  // angle du premier item (depuis sphère)
-const ARC_END    =  52 * Math.PI/180;  // angle du dernier item
-
-function getItemAngle(i){
-  const n = ITEMS.length;
-  return ARC_START + (ARC_END - ARC_START) * (i / (n-1));
+  if(!menuOpen) return {x:window.innerWidth/2, y:window.innerHeight/2};
+  return {x:window.innerWidth*0.22, y:window.innerHeight*0.50};
 }
 
 function positionItems(){
-  const sc = getSphereCenter();
-  const arcR = Math.min(window.innerWidth, window.innerHeight) * 0.42;
-  itemEls.forEach((el, i)=>{
-    const angle  = getItemAngle(i);
-    // Centre de l'icône sur l'arc
-    const ix = sc.x + Math.cos(angle) * arcR;
-    const iy = sc.y + Math.sin(angle) * arcR;
-    // L'item s'aligne : icône à droite, label à sa gauche
-    const iconW = 54, labelW = 130;
-    const totalW = labelW + 14 + iconW;
-    // On positionne l'item centré sur le point de l'arc
-    el.style.left = (ix - iconW/2 - labelW - 14) + 'px';
-    el.style.top  = (iy - 27) + 'px';
-    el.style.width = totalW + 'px';
+  const sc  = getSphereCenter();
+  const arcR= Math.min(window.innerWidth,window.innerHeight)*0.42;
+  itemEls.forEach((el,i)=>{
+    const angle=getItemAngle(i);
+    const ix=sc.x+Math.cos(angle)*arcR;
+    const iy=sc.y+Math.sin(angle)*arcR;
+    el.style.left=(ix-54/2-130-14)+'px';
+    el.style.top =(iy-27)+'px';
+    el.style.width=(130+14+54)+'px';
   });
 }
 
-/* Rayon lumineux projeté de la sphère vers l'item */
-function drawRay(sc, targetEl, progress, hue){
-  if(!targetEl) return;
-  const rect = targetEl.getBoundingClientRect();
-  // Point d'arrivée = centre de l'icône
-  const iconEl = targetEl.querySelector('.item-icon');
-  const ir = iconEl.getBoundingClientRect();
-  const tx = ir.left + ir.width/2;
-  const ty = ir.top  + ir.height/2;
+function resize(){ arcCv.width=window.innerWidth; arcCv.height=window.innerHeight; positionItems(); }
 
-  const dx = tx - sc.x, dy = ty - sc.y;
-  const dist = Math.sqrt(dx*dx + dy*dy);
-
-  // Rayon de la sphère affichée (px réels)
-  const sphereR = 190/2 * 0.78; // taille*scale
-
-  // Point de départ sur la surface de la sphère
-  const nx = dx/dist, ny = dy/dist;
-  const sx = sc.x + nx * sphereR;
-  const sy = sc.y + ny * sphereR;
-
-  // Point d'arrivée animé
-  const ex = sx + dx * progress;
-  const ey = sy + dy * progress;
+function drawRay(sc, targetEl, progress){
+  const iconEl=targetEl.querySelector('.item-icon');
+  const ir=iconEl.getBoundingClientRect();
+  const tx=ir.left+ir.width/2, ty=ir.top+ir.height/2;
+  const dx=tx-sc.x, dy=ty-sc.y;
+  const dist=Math.sqrt(dx*dx+dy*dy);
+  const sphereR=200/2*0.78*0.9;
+  const nx=dx/dist, ny=dy/dist;
+  const sx=sc.x+nx*sphereR, sy=sc.y+ny*sphereR;
+  const ex=sx+dx*progress, ey=sy+dy*progress;
 
   actx.save();
-  const grad = actx.createLinearGradient(sx, sy, ex, ey);
-  grad.addColorStop(0.0, `hsla(${270+hue},80%,75%,0.0)`);
-  grad.addColorStop(0.15,`hsla(${270+hue},80%,75%,0.55)`);
-  grad.addColorStop(0.6, `hsla(${200+hue},85%,72%,0.40)`);
-  grad.addColorStop(0.85,`hsla(${160+hue},80%,70%,0.55)`);
-  grad.addColorStop(1.0, `hsla(${160+hue},80%,70%,0.0)`);
-
-  actx.beginPath();
-  actx.moveTo(sx, sy);
-  actx.lineTo(ex, ey);
-  actx.strokeStyle = grad;
-  actx.lineWidth = 1.2;
-  actx.shadowColor = `hsla(${200+hue},90%,72%,0.4)`;
-  actx.shadowBlur = 6;
+  // Rayon blanc néon
+  const grad=actx.createLinearGradient(sx,sy,ex,ey);
+  grad.addColorStop(0.0,'rgba(255,255,255,0)');
+  grad.addColorStop(0.1,'rgba(255,255,255,0.6)');
+  grad.addColorStop(0.7,'rgba(255,255,255,0.35)');
+  grad.addColorStop(1.0,'rgba(255,255,255,0)');
+  actx.beginPath();actx.moveTo(sx,sy);actx.lineTo(ex,ey);
+  actx.strokeStyle=grad;actx.lineWidth=1;
+  actx.shadowColor='rgba(255,255,255,0.5)';actx.shadowBlur=8;
   actx.stroke();
-
-  // Petite lueur au bout du rayon
-  if(progress > 0.85){
-    const alpha = (progress - 0.85) / 0.15;
-    const glow = actx.createRadialGradient(ex,ey,0,ex,ey,18);
-    glow.addColorStop(0, `hsla(${220+hue},90%,80%,${0.35*alpha})`);
-    glow.addColorStop(1, 'rgba(0,0,0,0)');
-    actx.fillStyle = glow;
-    actx.beginPath();
-    actx.arc(ex,ey,18,0,Math.PI*2);
-    actx.fill();
+  // Lueur terminale
+  if(progress>0.82){
+    const alpha=(progress-0.82)/0.18;
+    const g2=actx.createRadialGradient(ex,ey,0,ex,ey,16);
+    g2.addColorStop(0,`rgba(255,255,255,${0.4*alpha})`);
+    g2.addColorStop(1,'rgba(0,0,0,0)');
+    actx.fillStyle=g2;actx.beginPath();actx.arc(ex,ey,16,0,Math.PI*2);actx.fill();
   }
   actx.restore();
 }
 
-/* Arc décoratif en pointillés fins */
 function drawArcLine(sc){
-  const arcR = Math.min(window.innerWidth, window.innerHeight) * 0.42;
+  const arcR=Math.min(window.innerWidth,window.innerHeight)*0.42;
   actx.save();
   actx.beginPath();
-  actx.arc(sc.x, sc.y, arcR, ARC_START - 0.08, ARC_END + 0.08);
-  actx.strokeStyle = 'rgba(0,0,0,0.055)';
-  actx.lineWidth = 0.8;
-  actx.setLineDash([3,8]);
-  actx.stroke();
-  actx.setLineDash([]);
+  actx.arc(sc.x,sc.y,arcR,ARC_START-0.06,ARC_END+0.06);
+  actx.strokeStyle='rgba(255,255,255,0.07)';
+  actx.lineWidth=0.8;actx.setLineDash([3,9]);actx.stroke();actx.setLineDash([]);
   actx.restore();
 }
 
-/* Loop de rendu du canvas arc */
 function arcLoop(){
   requestAnimationFrame(arcLoop);
-  if(!menuOpen){ actx.clearRect(0,0,arcCv.width,arcCv.height); return; }
-
   actx.clearRect(0,0,arcCv.width,arcCv.height);
-  pulseT += 0.04;
-
-  const sc = getSphereCenter();
-  const hue = t * 18; // sync avec la sphère
-
+  if(!menuOpen) return;
+  pulseT+=0.04;
+  const sc=getSphereCenter();
   drawArcLine(sc);
-
-  // Rayon vers item hovered ou actif
-  const targetIdx = hoveredIdx >= 0 ? hoveredIdx : activeIdx;
-  if(targetIdx >= 0){
-    if(rayTarget !== targetIdx){
-      rayTarget   = targetIdx;
-      rayProgress = 0;
-      rayActive   = true;
-    }
-    if(rayActive && rayProgress < 1) rayProgress = Math.min(1, rayProgress + 0.06);
-    drawRay(sc, itemEls[rayTarget], rayProgress, hue);
-  } else {
-    rayTarget   = -1;
-    rayProgress = 0;
-    rayActive   = false;
-  }
+  const ti=hoveredIdx>=0?hoveredIdx:activeIdx;
+  if(ti>=0){
+    if(rayTarget!==ti){rayTarget=ti;rayProgress=0;}
+    if(rayProgress<1) rayProgress=Math.min(1,rayProgress+0.07);
+    drawRay(sc,itemEls[rayTarget],rayProgress);
+  } else {rayTarget=-1;rayProgress=0;}
 }
 arcLoop();
 
-/* ── Interactions ── */
-function openMenu(){
-  if(menuOpen) return;
-  menuOpen = true;
-  app.classList.add('menu-open');
-  setTimeout(positionItems, 50);
-}
-function closeMenu(){
-  if(!menuOpen) return;
-  menuOpen = false;
-  hoveredIdx = -1;
-  app.classList.remove('menu-open');
-}
+function openMenu(){if(menuOpen)return;menuOpen=true;app.classList.add('menu-open');setTimeout(positionItems,50);}
+function closeMenu(){if(!menuOpen)return;menuOpen=false;hoveredIdx=-1;app.classList.remove('menu-open');}
 
-wrap.addEventListener('click', ()=>{ menuOpen ? closeMenu() : openMenu(); });
+wrap.addEventListener('click',()=>{menuOpen?closeMenu():openMenu();});
 
-itemEls.forEach((el, i)=>{
-  el.addEventListener('mouseenter', ()=>{ hoveredIdx = i; el.classList.add('hovered'); });
-  el.addEventListener('mouseleave', ()=>{ hoveredIdx = -1; el.classList.remove('hovered'); });
-  el.addEventListener('click', (e)=>{
+itemEls.forEach((el,i)=>{
+  el.addEventListener('mouseenter',()=>{hoveredIdx=i;el.classList.add('hovered');});
+  el.addEventListener('mouseleave',()=>{hoveredIdx=-1;el.classList.remove('hovered');});
+  el.addEventListener('click',(e)=>{
     e.stopPropagation();
     itemEls.forEach(it=>it.classList.remove('active'));
-    activeIdx = (activeIdx === i) ? -1 : i;
-    if(activeIdx >= 0) el.classList.add('active');
-    setTimeout(closeMenu, 400);
+    activeIdx=(activeIdx===i)?-1:i;
+    if(activeIdx>=0)el.classList.add('active');
+    setTimeout(closeMenu,380);
   });
-  // Touch
-  el.addEventListener('touchstart', ()=>{ hoveredIdx = i; }, {passive:true});
-  el.addEventListener('touchend', (e)=>{
+  el.addEventListener('touchend',(e)=>{
     e.stopPropagation();
     itemEls.forEach(it=>it.classList.remove('active'));
-    activeIdx = (activeIdx === i) ? -1 : i;
-    if(activeIdx >= 0) el.classList.add('active');
-    hoveredIdx = -1;
-    setTimeout(closeMenu, 400);
+    activeIdx=(activeIdx===i)?-1:i;
+    if(activeIdx>=0)el.classList.add('active');
+    hoveredIdx=-1;setTimeout(closeMenu,380);
   });
 });
 
-// Clic en dehors = fermer
-app.addEventListener('click', (e)=>{
-  if(menuOpen && !wrap.contains(e.target) && ![...itemEls].some(el=>el.contains(e.target))){
-    closeMenu();
-  }
+app.addEventListener('click',(e)=>{
+  if(menuOpen&&!wrap.contains(e.target)&&![...itemEls].some(el=>el.contains(e.target))) closeMenu();
 });
-
-window.addEventListener('resize', ()=>{ resize(); positionItems(); });
+window.addEventListener('resize',resize);
 resize();
 </script>
 </body>
