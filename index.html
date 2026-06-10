@@ -13,8 +13,6 @@
     font-family: -apple-system, 'SF Pro Display', sans-serif;
     -webkit-font-smoothing: antialiased;
   }
-
-  /* CANVAS */
   #c {
     display: block;
     touch-action: none;
@@ -22,43 +20,35 @@
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
     z-index: 0;
-    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-                top 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.7s cubic-bezier(0.16,1,0.3,1), top 0.7s cubic-bezier(0.16,1,0.3,1);
   }
-
   #c.menu-open {
     top: 72%;
     transform: translate(-50%, -50%) scale(0.55);
   }
-
-  /* HALO */
   #halo-wrap {
     position: fixed;
     top: 50%; left: 50%;
     width: 0; height: 0;
     pointer-events: none;
     z-index: 2;
-    transition: top 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: top 0.7s cubic-bezier(0.16,1,0.3,1);
   }
-  #halo-wrap.menu-open {
-    top: 72%;
-  }
+  #halo-wrap.menu-open { top: 72%; }
   .halo-ring {
     position: absolute;
     border-radius: 50%;
     transform: translate(-50%, -50%);
-    animation: halo-expand 5s cubic-bezier(0.1, 0.4, 0.3, 1) infinite;
+    animation: halo-expand 5s cubic-bezier(0.1,0.4,0.3,1) infinite;
   }
   .halo-ring:nth-child(1) { animation-delay: 0s; }
   .halo-ring:nth-child(2) { animation-delay: 1.65s; }
   .halo-ring:nth-child(3) { animation-delay: 3.3s; }
   @keyframes halo-expand {
-    0%   { width: min(74vw, 330px); height: min(74vw, 330px); border: 0.8px solid rgba(0,190,255,0.55); opacity: 0; }
+    0%   { width: min(74vw,330px); height: min(74vw,330px); border: 0.8px solid rgba(0,190,255,0.55); opacity: 0; }
     5%   { opacity: 1; }
-    100% { width: min(220vw, 980px); height: min(220vw, 980px); border: 0.5px solid rgba(0,140,255,0); opacity: 0; }
+    100% { width: min(220vw,980px); height: min(220vw,980px); border: 0.5px solid rgba(0,140,255,0); opacity: 0; }
   }
-
-  /* MENU OVERLAY */
   #menu {
     position: fixed;
     inset: 0;
@@ -67,17 +57,12 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding-top: env(safe-area-inset-top, 60px);
+    padding-top: max(env(safe-area-inset-top), 60px);
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.5s ease;
   }
-  #menu.visible {
-    opacity: 1;
-    pointer-events: all;
-  }
-
-  /* CLOSE HINT */
+  #menu.visible { opacity: 1; pointer-events: all; }
   #close-hint {
     font-size: 11px;
     letter-spacing: 0.18em;
@@ -86,16 +71,12 @@
     margin-bottom: 48px;
     margin-top: 8px;
   }
-
-  /* MENU LIST */
   #menu-list {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0;
     width: 100%;
   }
-
   .menu-item {
     display: flex;
     align-items: center;
@@ -110,12 +91,8 @@
     transition: opacity 0.5s ease, transform 0.5s ease;
     -webkit-tap-highlight-color: transparent;
   }
-  .menu-item.show {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  .menu-item.show { opacity: 1; transform: translateY(0); }
   .menu-item:nth-child(1) { transition-delay: 0.08s; }
-
   .item-label {
     font-size: 22px;
     font-weight: 300;
@@ -123,54 +100,27 @@
     color: rgba(255,255,255,0.55);
     transition: color 0.3s;
   }
-  .menu-item.active .item-label {
-    color: rgba(255,255,255,0.95);
-  }
-
+  .menu-item.active .item-label { color: rgba(255,255,255,0.95); }
   .item-icon {
-    width: 58px;
-    height: 58px;
+    width: 58px; height: 58px;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     background: rgba(255,255,255,0.04);
     border: 0.5px solid rgba(255,255,255,0.08);
     transition: all 0.3s ease;
     flex-shrink: 0;
   }
   .menu-item.active .item-icon {
-    background: rgba(0, 160, 255, 0.12);
-    border-color: rgba(0, 200, 255, 0.35);
-    box-shadow: 0 0 20px rgba(0, 180, 255, 0.2);
+    background: rgba(0,160,255,0.12);
+    border-color: rgba(0,200,255,0.35);
+    box-shadow: 0 0 20px rgba(0,180,255,0.2);
   }
-  .item-icon svg {
-    width: 26px;
-    height: 26px;
-  }
-
-  /* DIVIDER LINE */
-  .item-divider {
-    width: 180px;
-    height: 0.5px;
-    background: rgba(255,255,255,0.06);
-    margin: 0 auto;
-  }
-
-  /* CONNECTOR LINE (like the image) */
-  .item-connector {
-    width: 0.5px;
-    height: 20px;
-    background: rgba(255,255,255,0.08);
-    margin: 0 29px 0 auto;
-    margin-right: 29px;
-  }
+  .item-icon svg { width: 26px; height: 26px; }
 </style>
 </head>
 <body>
 
 <canvas id="c"></canvas>
-
 <div id="halo-wrap">
   <div class="halo-ring"></div>
   <div class="halo-ring"></div>
@@ -180,7 +130,6 @@
 <div id="menu">
   <div id="close-hint">appuyer pour fermer</div>
   <div id="menu-list">
-
     <div class="menu-item" id="item-gym" onclick="selectItem(this)">
       <div class="item-label">Salle de sport</div>
       <div class="item-icon">
@@ -191,24 +140,22 @@
         </svg>
       </div>
     </div>
-
   </div>
 </div>
 
 <script>
-/* ── WebGL agent ── */
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 const canvas = document.getElementById('c');
-const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
-const DPR = Math.min(window.devicePixelRatio || 1, 2);
-
+const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+const DPR = isMobile ? Math.min(window.devicePixelRatio || 1, 1.5) : Math.min(window.devicePixelRatio || 1, 2);
 let menuOpen = false;
 
 function resize() {
   const s = Math.min(window.innerWidth, window.innerHeight);
   canvas.style.width = s + 'px';
   canvas.style.height = s + 'px';
-  canvas.width = s * DPR;
-  canvas.height = s * DPR;
+  canvas.width = Math.floor(s * DPR);
+  canvas.height = Math.floor(s * DPR);
   gl.viewport(0, 0, canvas.width, canvas.height);
 }
 resize();
@@ -216,10 +163,100 @@ window.addEventListener('resize', resize);
 
 const VS = `attribute vec2 a_pos; void main(){ gl_Position=vec4(a_pos,0.,1.); }`;
 
-const FS = `
+// MOBILE: lighter shader — fewer march steps, fewer FBM octaves, no ribbon loop
+const FS_MOBILE = `
+precision mediump float;
+uniform float u_time;
+uniform vec2 u_res;
+uniform float u_menu;
+#define TAU 6.28318
+
+vec3 hash3(vec3 p){p=fract(p*vec3(443.8,397.3,491.2));p+=dot(p.zxy,p.yxz+19.19);return fract(vec3(p.x*p.y,p.y*p.z,p.z*p.x)*2.46);}
+float noise(vec3 p){
+  vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+  return mix(mix(mix(dot(hash3(i)-.5,f),dot(hash3(i+vec3(1,0,0))-.5,f-vec3(1,0,0)),f.x),
+             mix(dot(hash3(i+vec3(0,1,0))-.5,f-vec3(0,1,0)),dot(hash3(i+vec3(1,1,0))-.5,f-vec3(1,1,0)),f.x),f.y),
+         mix(mix(dot(hash3(i+vec3(0,0,1))-.5,f-vec3(0,0,1)),dot(hash3(i+vec3(1,0,1))-.5,f-vec3(1,0,1)),f.x),
+             mix(dot(hash3(i+vec3(0,1,1))-.5,f-vec3(0,1,1)),dot(hash3(i+vec3(1,1,1))-.5,f-vec3(1,1,1)),f.x),f.y),f.z);
+}
+float fbm(vec3 p){float v=0.,a=0.5;for(int i=0;i<3;i++){v+=a*noise(p);p=p*2.1+vec3(1.7,9.2,3.1);a*=0.5;}return v;}
+mat3 rotY(float a){float c=cos(a),s=sin(a);return mat3(c,0,s,0,1,0,-s,0,c);}
+mat3 rotX(float a){float c=cos(a),s=sin(a);return mat3(1,0,0,0,c,-s,0,s,c);}
+
+float scene(vec3 p, float t){
+  float n=fbm(p*1.6+vec3(t*.1,t*.08,t*.06));
+  float n2=fbm(p*2.2-vec3(t*.07,t*.1,t*.04));
+  return length(p)-(0.72+n*.15+n2*.08);
+}
+vec3 calcNormal(vec3 p,float t){
+  vec2 e=vec2(.002,0.);
+  return normalize(vec3(scene(p+e.xyy,t)-scene(p-e.xyy,t),scene(p+e.yxy,t)-scene(p-e.yxy,t),scene(p+e.yyx,t)-scene(p-e.yyx,t)));
+}
+float spec(vec3 n,vec3 l,vec3 v,float pw){return pow(max(dot(n,normalize(l+v)),0.),pw);}
+
+void main(){
+  vec2 uv=(gl_FragCoord.xy/u_res)*2.-1.;
+  float t=u_time;
+  float lev=sin(t*.55)*.025+sin(t*.3)*.01;
+  mat3 gRot=rotY(t*(TAU/25.))*rotX(sin(t*.18)*.12);
+  vec3 ro=vec3(0.,lev,2.4), rd=normalize(vec3(uv*.7,-1.));
+
+  float dist=0.; bool hit=false; vec3 p;
+  for(int i=0;i<52;i++){
+    p=gRot*(ro+rd*dist);
+    float d=scene(p,t);
+    if(d<.0012){hit=true;break;}
+    if(dist>5.) break;
+    dist+=d*.6;
+  }
+
+  vec3 col=vec3(0.);
+  if(hit){
+    vec3 n=calcNormal(p,t), v=normalize(ro-p);
+    float pulse=.6+.4*sin(t*.9)*sin(t*.6);
+    vec3 l1=normalize(vec3(-1.2,1.4,1.8));
+    vec3 l2=normalize(vec3(1.8,-.6,1.));
+    float fr=pow(1.-max(dot(n,v),0.),3.8);
+    float frs=pow(1.-max(dot(n,v),0.),1.4);
+    float s1=spec(n,l1,v,160.)*.9;
+    float s2=spec(n,l2,v,280.)*.7;
+    float s3=spec(n,l1,v,1800.)*1.0;
+
+    float iFbm=fbm(p*1.2+vec3(t*.05,t*.03,t*.04));
+    col=mix(vec3(.01,.02,.09),vec3(.05,.12,.38),frs*.5+iFbm*.4);
+    col+=vec3(0.,.3,.6)*max(dot(n,l1),0.)*.4;
+    col+=vec3(0.,.2,.45)*max(dot(n,l2),0.)*.3;
+
+    // caustic light
+    float caust=pow((sin(p.x*7.+t*.6)*sin(p.y*5.+t*.45)*.5+.5)*.5,2.0);
+    col+=vec3(0.,.3,.55)*caust*.2*pulse;
+
+    col+=vec3(.4,.65,1.)*s1*pulse;
+    col+=vec3(0.,.9,1.)*s2*.7;
+    col+=vec3(.9,.95,1.)*s3;
+    col+=vec3(0.,.75,1.)*fr*.6*pulse;
+    col+=vec3(.1,.3,1.)*fr*fr*.4;
+
+    float ig=exp(-length(p)*2.2);
+    col+=vec3(.04,.1,.45)*ig*pulse*.7;
+
+    col=pow(col,vec3(.88))*vec3(.85,.92,1.)*(1.-fr*.12);
+    col*=mix(1., .45, u_menu);
+  } else {
+    float d2s=length(uv)-.5;
+    col+=vec3(0.,.1,.3)*exp(-max(d2s,0.)*12.)*.15;
+    col*=mix(1., .3, u_menu);
+  }
+  gl_FragColor=vec4(clamp(col,0.,1.),1.);
+}
+`;
+
+// DESKTOP: full quality shader
+const FS_DESKTOP = `
 precision highp float;
 uniform float u_time;
 uniform vec2 u_res;
+uniform float u_menu;
 #define TAU 6.28318530717959
 vec3 hash3(vec3 p){p=fract(p*vec3(443.8975,397.2973,491.1871));p+=dot(p.zxy,p.yxz+19.19);return fract(vec3(p.x*p.y,p.y*p.z,p.z*p.x)*2.46);}
 float noise(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(mix(dot(hash3(i+vec3(0,0,0))-.5,f-vec3(0,0,0)),dot(hash3(i+vec3(1,0,0))-.5,f-vec3(1,0,0)),f.x),mix(dot(hash3(i+vec3(0,1,0))-.5,f-vec3(0,1,0)),dot(hash3(i+vec3(1,1,0))-.5,f-vec3(1,1,0)),f.x),f.y),mix(mix(dot(hash3(i+vec3(0,0,1))-.5,f-vec3(0,0,1)),dot(hash3(i+vec3(1,0,1))-.5,f-vec3(1,0,1)),f.x),mix(dot(hash3(i+vec3(0,1,1))-.5,f-vec3(0,1,1)),dot(hash3(i+vec3(1,1,1))-.5,f-vec3(1,1,1)),f.x),f.y),f.z);}
@@ -228,21 +265,20 @@ mat3 rotY(float a){float c=cos(a),s=sin(a);return mat3(c,0,s,0,1,0,-s,0,c);}
 mat3 rotX(float a){float c=cos(a),s=sin(a);return mat3(1,0,0,0,c,-s,0,s,c);}
 mat3 rotZ(float a){float c=cos(a),s=sin(a);return mat3(c,-s,0,s,c,0,0,0,1);}
 float sdSphere(vec3 p,float r){return length(p)-r;}
-float warp(vec3 p,float t){float n=fbm(p*1.8+vec3(t*.12,t*.09,t*.07));float n2=fbm(p*2.6-vec3(t*.08,t*.13,t*.05));return n*.18+n2*.10;}
+float warp(vec3 p,float t){return fbm(p*1.8+vec3(t*.12,t*.09,t*.07))*.18+fbm(p*2.6-vec3(t*.08,t*.13,t*.05))*.10;}
 float scene(vec3 p,float t){return sdSphere(p,0.72+warp(p,t));}
 float layerScene(vec3 p,float t,float off){vec3 q=p*rotY(t*.04+off)*rotX(t*.025+off*.5);return sdSphere(q,0.54+off*.09+warp(q*.9,t+off*3.)*.8);}
 vec3 calcNormal(vec3 p,float t){vec2 e=vec2(.001,0.);return normalize(vec3(scene(p+e.xyy,t)-scene(p-e.xyy,t),scene(p+e.yxy,t)-scene(p-e.yxy,t),scene(p+e.yyx,t)-scene(p-e.yyx,t)));}
 float caustic(vec3 p,float t){float c=sin(p.x*8.+t*.7)*sin(p.y*6.+t*.5)*.5+.5;c+=sin(p.x*14.-t*.4+p.z*5.)*.25+.25;return pow(c*.5,2.2);}
-float spec(vec3 n,vec3 l,vec3 v,float pw){vec3 h=normalize(l+v);return pow(max(dot(n,h),0.),pw);}
+float spec(vec3 n,vec3 l,vec3 v,float pw){return pow(max(dot(n,normalize(l+v)),0.),pw);}
 void main(){
-  vec2 uv=(gl_FragCoord.xy/u_res.xy)*2.-1.;
+  vec2 uv=(gl_FragCoord.xy/u_res)*2.-1.;
   float t=u_time;
   float lev=sin(t*.55)*.028+sin(t*.31)*.012;
   mat3 gRot=rotY(t*(TAU/25.))*rotX(sin(t*.18)*.15)*rotZ(sin(t*.13)*.06);
-  vec3 ro=vec3(0.,lev,2.4),rd=normalize(vec3(uv*.7,-1.));
-  rd=rotY(sin(t*.07)*.04)*rd;
+  vec3 ro=vec3(0.,lev,2.4),rd=rotY(sin(t*.07)*.04)*normalize(vec3(uv*.7,-1.));
   float dist=0.;bool hit=false;vec3 p;
-  for(int i=0;i<96;i++){p=ro+rd*dist;p=gRot*p;float d=scene(p,t);if(d<.0008){hit=true;break;}if(dist>6.)break;dist+=d*.55;}
+  for(int i=0;i<96;i++){p=gRot*(ro+rd*dist);float d=scene(p,t);if(d<.0008){hit=true;break;}if(dist>6.)break;dist+=d*.55;}
   vec3 col=vec3(0.);
   if(hit){
     vec3 n=calcNormal(p,t),v=normalize(ro-p);
@@ -255,38 +291,27 @@ void main(){
     vec3 base=mix(vec3(.01,.02,.09),vec3(.04,.09,.28),frs*.5);
     float iFbm=fbm(p*1.4+vec3(t*.06,t*.04,t*.05));
     vec3 inner=mix(vec3(.02,.04,.18),vec3(.08,.18,.55),iFbm);
-    float rN=0.;
-    for(int li=0;li<3;li++){float lo=float(li)*.7;rN+=exp(-abs(layerScene(p,t,lo))*18.)*(0.4-float(li)*.1);}
+    float rN=0.;for(int li=0;li<3;li++){float lo=float(li)*.7;rN+=exp(-abs(layerScene(p,t,lo))*18.)*(0.4-float(li)*.1);}
     rN=clamp(rN,0.,1.);
     vec3 rCol=mix(vec3(.05,.12,.5),vec3(.15,.4,.95),rN);
-    col=mix(mix(base,inner,.6)+rCol*rN*.55*pulse2,col,0.);
-    col+=rCol*rN*.55*pulse2+vec3(.04,.12,.45)*d1*.5+vec3(0.,.25,.45)*d2*.35+vec3(.08,.02,.35)*d3*.25;
+    col=mix(base,inner,.6)+rCol*rN*.55*pulse2;
+    col+=vec3(.04,.12,.45)*d1*.5+vec3(0.,.25,.45)*d2*.35+vec3(.08,.02,.35)*d3*.25;
     col+=vec3(0.,.35,.6)*caust*.25*pulse+vec3(.1,.25,.8)*caust*caust*.15;
     col+=vec3(.4,.65,1.)*s1*pulse+vec3(0.,.9,1.)*s2*.8+vec3(.85,.92,1.)*s3+vec3(.2,.5,1.)*s4*frs;
     col+=vec3(0.,.75,1.)*fr*.65*(.7+.3*pulse)+vec3(.15,.3,1.)*fr*fr*.45;
-    float ig=exp(-length(p)*2.2);
-    col+=vec3(.05,.1,.5)*ig*pulse*.8+vec3(0.,.2,.6)*ig*ig*.5;
+    float ig=exp(-length(p)*2.2);col+=vec3(.05,.1,.5)*ig*pulse*.8+vec3(0.,.2,.6)*ig*ig*.5;
     float w1=sin(dot(n,vec3(1,0,0))*12.+t*1.4)*.5+.5,w2=sin(dot(n,vec3(0,1,.5))*9.-t*.9+1.)*.5+.5;
     col+=vec3(0.,.4,.8)*w1*w2*w1*w2*.08;
     col=pow(col,vec3(.88))*vec3(.85,.92,1.)*(1.-fr*.15);
-    // dim when menu open
-    col*=u_menuOpen>0.5?0.45:1.0;
-  }
-  if(!hit){
+    col*=mix(1.,.45,u_menu);
+  } else {
     float d2s=length(uv)-.52;
     col+=vec3(0.,.12,.35)*exp(-max(d2s,0.)*14.)*.18+vec3(0.,.05,.15)*exp(-max(d2s,0.)*5.)*.08;
-    if(u_menuOpen>0.5) col*=0.3;
+    col*=mix(1.,.3,u_menu);
   }
-  col=clamp(col,0.,1.);
-  gl_FragColor=vec4(col,1.);
+  gl_FragColor=vec4(clamp(col,0.,1.),1.);
 }
 `;
-
-// patch: add uniform
-const FS_PATCHED = FS.replace(
-  'uniform vec2 u_res;',
-  'uniform vec2 u_res;\nuniform float u_menuOpen;'
-);
 
 function compile(type, src) {
   const s = gl.createShader(type);
@@ -295,8 +320,9 @@ function compile(type, src) {
   return s;
 }
 const prog = gl.createProgram();
+const shaderSrc = isMobile ? FS_MOBILE : FS_DESKTOP;
 gl.attachShader(prog, compile(gl.VERTEX_SHADER, VS));
-gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FS_PATCHED));
+gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, shaderSrc));
 gl.linkProgram(prog);
 gl.useProgram(prog);
 
@@ -309,58 +335,62 @@ gl.vertexAttribPointer(aloc, 2, gl.FLOAT, false, 0, 0);
 
 const uTime = gl.getUniformLocation(prog, 'u_time');
 const uRes  = gl.getUniformLocation(prog, 'u_res');
-const uMenuOpen = gl.getUniformLocation(prog, 'u_menuOpen');
+const uMenu = gl.getUniformLocation(prog, 'u_menu');
+
+// Throttle to 30fps on mobile
+let lastFrame = 0;
+const FPS_LIMIT = isMobile ? 30 : 60;
+const FRAME_MS = 1000 / FPS_LIMIT;
 
 const start = performance.now();
-function frame() {
-  const t = (performance.now() - start) / 1000;
+function frame(now) {
+  requestAnimationFrame(frame);
+  if (now - lastFrame < FRAME_MS) return;
+  lastFrame = now;
+  const t = (now - start) / 1000;
   gl.uniform1f(uTime, t);
   gl.uniform2f(uRes, canvas.width, canvas.height);
-  gl.uniform1f(uMenuOpen, menuOpen ? 1.0 : 0.0);
+  gl.uniform1f(uMenu, menuOpen ? 1.0 : 0.0);
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-  requestAnimationFrame(frame);
 }
-frame();
+requestAnimationFrame(frame);
 
-/* ── MENU LOGIC ── */
+/* ── MENU ── */
 function openMenu() {
   menuOpen = true;
   canvas.classList.add('menu-open');
   document.getElementById('halo-wrap').classList.add('menu-open');
   const menu = document.getElementById('menu');
   menu.classList.add('visible');
-  // stagger items
   document.querySelectorAll('.menu-item').forEach((el, i) => {
     setTimeout(() => el.classList.add('show'), 80 + i * 60);
   });
 }
-
 function closeMenu() {
   menuOpen = false;
   canvas.classList.remove('menu-open');
   document.getElementById('halo-wrap').classList.remove('menu-open');
-  const menu = document.getElementById('menu');
-  menu.classList.remove('visible');
+  document.getElementById('menu').classList.remove('visible');
   document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('show'));
 }
 
-canvas.addEventListener('click', () => {
-  if (!menuOpen) openMenu(); else closeMenu();
-});
+let touchMoved = false;
+canvas.addEventListener('touchstart', () => { touchMoved = false; }, { passive: true });
+canvas.addEventListener('touchmove', () => { touchMoved = true; }, { passive: true });
 canvas.addEventListener('touchend', (e) => {
+  if (touchMoved) return;
   e.preventDefault();
-  if (!menuOpen) openMenu(); else closeMenu();
+  menuOpen ? closeMenu() : openMenu();
 }, { passive: false });
+canvas.addEventListener('click', () => { menuOpen ? closeMenu() : openMenu(); });
 
 document.getElementById('close-hint').addEventListener('click', closeMenu);
+document.getElementById('close-hint').addEventListener('touchend', (e) => { e.preventDefault(); closeMenu(); }, { passive: false });
 
 function selectItem(el) {
   document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
   el.classList.add('active');
-  // navigate — placeholder
-  setTimeout(() => {
-    closeMenu();
-  }, 400);
+  setTimeout(() => closeMenu(), 400);
 }
 </script>
 </body>
