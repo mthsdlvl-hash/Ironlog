@@ -2,396 +2,248 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>brain</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>ARTEFACT</title>
 <style>
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body {
-    width: 100%; height: 100%;
-    background: #000;
-    overflow: hidden;
-    font-family: -apple-system, 'SF Pro Display', sans-serif;
-    -webkit-font-smoothing: antialiased;
+  :root{
+    --noir:#000000;
+    --rouge:#ff1f10;
+    --texte:rgba(255,235,232,0.82);
   }
-  #c {
-    display: block;
-    touch-action: none;
-    position: fixed;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 0;
-    transition: transform 0.7s cubic-bezier(0.16,1,0.3,1), top 0.7s cubic-bezier(0.16,1,0.3,1);
-  }
-  #c.menu-open {
-    top: 72%;
-    transform: translate(-50%, -50%) scale(0.55);
-  }
-  #halo-wrap {
-    position: fixed;
-    top: 50%; left: 50%;
-    width: 0; height: 0;
-    pointer-events: none;
-    z-index: 2;
-    transition: top 0.7s cubic-bezier(0.16,1,0.3,1);
-  }
-  #halo-wrap.menu-open { top: 72%; }
-  .halo-ring {
-    position: absolute;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    animation: halo-expand 5s cubic-bezier(0.1,0.4,0.3,1) infinite;
-  }
-  .halo-ring:nth-child(1) { animation-delay: 0s; }
-  .halo-ring:nth-child(2) { animation-delay: 1.65s; }
-  .halo-ring:nth-child(3) { animation-delay: 3.3s; }
-  @keyframes halo-expand {
-    0%   { width: min(74vw,330px); height: min(74vw,330px); border: 0.8px solid rgba(0,190,255,0.55); opacity: 0; }
-    5%   { opacity: 1; }
-    100% { width: min(220vw,980px); height: min(220vw,980px); border: 0.5px solid rgba(0,140,255,0); opacity: 0; }
-  }
-  #menu {
-    position: fixed;
-    inset: 0;
-    z-index: 3;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding-top: max(env(safe-area-inset-top), 60px);
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-  }
-  #menu.visible { opacity: 1; pointer-events: all; }
-  #close-hint {
-    font-size: 11px;
-    letter-spacing: 0.18em;
-    color: rgba(255,255,255,0.2);
-    text-transform: lowercase;
-    margin-bottom: 48px;
-    margin-top: 8px;
-  }
-  #menu-list {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-  }
-  .menu-item {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 18px;
-    padding: 18px 0;
-    width: 100%;
-    max-width: 300px;
-    cursor: pointer;
-    opacity: 0;
-    transform: translateY(18px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;width:100%;overflow:hidden;background:var(--noir);}
+  body{
+    font-family: ui-monospace, "SF Mono", "Menlo", "Roboto Mono", monospace;
     -webkit-tap-highlight-color: transparent;
+    touch-action: none;
   }
-  .menu-item.show { opacity: 1; transform: translateY(0); }
-  .menu-item:nth-child(1) { transition-delay: 0.08s; }
-  .item-label {
-    font-size: 22px;
-    font-weight: 300;
-    letter-spacing: 0.04em;
-    color: rgba(255,255,255,0.55);
-    transition: color 0.3s;
+  #scene{position:fixed;inset:0;display:block;background:#000;}
+  /* ---- couche interface, volontairement minimale : l'agent domine ---- */
+  .ui{position:fixed;inset:0;pointer-events:none;z-index:2;
+      display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+      padding: max(28px, env(safe-area-inset-top)) 20px max(34px, env(safe-area-inset-bottom));}
+  .wordmark{
+    color:var(--texte);
+    font-size:13px;
+    font-weight:400;
+    letter-spacing:0.62em;
+    text-indent:0.62em;
+    opacity:0;
+    text-transform:uppercase;
+    animation: fadeIn 2.4s ease 0.4s forwards;
+    text-shadow:0 0 18px rgba(255,40,25,0.25);
   }
-  .menu-item.active .item-label { color: rgba(255,255,255,0.95); }
-  .item-icon {
-    width: 58px; height: 58px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    background: rgba(255,255,255,0.04);
-    border: 0.5px solid rgba(255,255,255,0.08);
-    transition: all 0.3s ease;
-    flex-shrink: 0;
+  .hint{
+    color:var(--texte);
+    font-size:11px;
+    letter-spacing:0.22em;
+    text-transform:uppercase;
+    opacity:0;
+    text-align:center;
+    animation: fadeIn 2.4s ease 1.1s forwards, breathe 4.6s ease-in-out 3s infinite;
   }
-  .menu-item.active .item-icon {
-    background: rgba(0,160,255,0.12);
-    border-color: rgba(0,200,255,0.35);
-    box-shadow: 0 0 20px rgba(0,180,255,0.2);
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:0.55;transform:translateY(0);}}
+  @keyframes breathe{0%,100%{opacity:0.32;}50%{opacity:0.7;}}
+  /* repli si WebGL indisponible */
+  .fallback{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:#000;z-index:1;}
+  .fallback .orb{width:42vmin;height:42vmin;border-radius:50%;
+    background:radial-gradient(circle at 50% 58%, #ff3a1e 0%, #c00f06 32%, #3a0301 64%, #050000 100%);
+    box-shadow:0 0 90px 20px rgba(255,30,12,0.35);
+    animation: pulse 4.5s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.035);}}
+  @media (prefers-reduced-motion: reduce){
+    .hint{animation: fadeIn 0.6s ease 1.1s forwards;}
+    .fallback .orb{animation:none;}
   }
-  .item-icon svg { width: 26px; height: 26px; }
 </style>
 </head>
 <body>
-
-<canvas id="c"></canvas>
-<div id="halo-wrap">
-  <div class="halo-ring"></div>
-  <div class="halo-ring"></div>
-  <div class="halo-ring"></div>
-</div>
-
-<div id="menu">
-  <div id="close-hint">appuyer pour fermer</div>
-  <div id="menu-list">
-    <div class="menu-item" id="item-gym" onclick="selectItem(this)">
-      <div class="item-label">Salle de sport</div>
-      <div class="item-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="rgba(0,200,255,0.8)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6.5 6.5h1M16.5 6.5h1M6.5 17.5h1M16.5 17.5h1"/>
-          <path d="M7.5 6.5v11M17.5 6.5v11"/>
-          <path d="M3 12h4.5M16.5 12H21M7.5 12h9"/>
-        </svg>
-      </div>
-    </div>
+  <canvas id="scene"></canvas>
+  <div class="fallback"><div class="orb"></div></div>
+  <div class="ui">
+    <div class="wordmark">ARTEFACT</div>
   </div>
-</div>
 
-<script>
-const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-const canvas = document.getElementById('c');
-const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-const DPR = isMobile ? Math.min(window.devicePixelRatio || 1, 1.5) : Math.min(window.devicePixelRatio || 1, 2);
-let menuOpen = false;
+<script id="vert" type="x-shader/x-vertex">
+attribute vec2 aPos;
+void main(){ gl_Position = vec4(aPos, 0.0, 1.0); }
+</script>
 
-function resize() {
-  const s = Math.min(window.innerWidth, window.innerHeight);
-  canvas.style.width = s + 'px';
-  canvas.style.height = s + 'px';
-  canvas.width = Math.floor(s * DPR);
-  canvas.height = Math.floor(s * DPR);
-  gl.viewport(0, 0, canvas.width, canvas.height);
-}
-resize();
-window.addEventListener('resize', resize);
-
-const VS = `attribute vec2 a_pos; void main(){ gl_Position=vec4(a_pos,0.,1.); }`;
-
-// MOBILE: lighter shader — fewer march steps, fewer FBM octaves, no ribbon loop
-const FS_MOBILE = `
-precision mediump float;
-uniform float u_time;
-uniform vec2 u_res;
-uniform float u_menu;
-#define TAU 6.28318
-
-vec3 hash3(vec3 p){p=fract(p*vec3(443.8,397.3,491.2));p+=dot(p.zxy,p.yxz+19.19);return fract(vec3(p.x*p.y,p.y*p.z,p.z*p.x)*2.46);}
-float noise(vec3 p){
-  vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
-  return mix(mix(mix(dot(hash3(i)-.5,f),dot(hash3(i+vec3(1,0,0))-.5,f-vec3(1,0,0)),f.x),
-             mix(dot(hash3(i+vec3(0,1,0))-.5,f-vec3(0,1,0)),dot(hash3(i+vec3(1,1,0))-.5,f-vec3(1,1,0)),f.x),f.y),
-         mix(mix(dot(hash3(i+vec3(0,0,1))-.5,f-vec3(0,0,1)),dot(hash3(i+vec3(1,0,1))-.5,f-vec3(1,0,1)),f.x),
-             mix(dot(hash3(i+vec3(0,1,1))-.5,f-vec3(0,1,1)),dot(hash3(i+vec3(1,1,1))-.5,f-vec3(1,1,1)),f.x),f.y),f.z);
-}
-float fbm(vec3 p){float v=0.,a=0.5;for(int i=0;i<3;i++){v+=a*noise(p);p=p*2.1+vec3(1.7,9.2,3.1);a*=0.5;}return v;}
-mat3 rotY(float a){float c=cos(a),s=sin(a);return mat3(c,0,s,0,1,0,-s,0,c);}
-mat3 rotX(float a){float c=cos(a),s=sin(a);return mat3(1,0,0,0,c,-s,0,s,c);}
-
-float scene(vec3 p, float t){
-  float n=fbm(p*1.6+vec3(t*.1,t*.08,t*.06));
-  float n2=fbm(p*2.2-vec3(t*.07,t*.1,t*.04));
-  return length(p)-(0.72+n*.15+n2*.08);
-}
-vec3 calcNormal(vec3 p,float t){
-  vec2 e=vec2(.002,0.);
-  return normalize(vec3(scene(p+e.xyy,t)-scene(p-e.xyy,t),scene(p+e.yxy,t)-scene(p-e.yxy,t),scene(p+e.yyx,t)-scene(p-e.yyx,t)));
-}
-float spec(vec3 n,vec3 l,vec3 v,float pw){return pow(max(dot(n,normalize(l+v)),0.),pw);}
-
-void main(){
-  vec2 uv=(gl_FragCoord.xy/u_res)*2.-1.;
-  float t=u_time;
-  float lev=sin(t*.55)*.025+sin(t*.3)*.01;
-  mat3 gRot=rotY(t*(TAU/25.))*rotX(sin(t*.18)*.12);
-  vec3 ro=vec3(0.,lev,2.4), rd=normalize(vec3(uv*.7,-1.));
-
-  float dist=0.; bool hit=false; vec3 p;
-  for(int i=0;i<52;i++){
-    p=gRot*(ro+rd*dist);
-    float d=scene(p,t);
-    if(d<.0012){hit=true;break;}
-    if(dist>5.) break;
-    dist+=d*.6;
-  }
-
-  vec3 col=vec3(0.);
-  if(hit){
-    vec3 n=calcNormal(p,t), v=normalize(ro-p);
-    float pulse=.6+.4*sin(t*.9)*sin(t*.6);
-    vec3 l1=normalize(vec3(-1.2,1.4,1.8));
-    vec3 l2=normalize(vec3(1.8,-.6,1.));
-    float fr=pow(1.-max(dot(n,v),0.),3.8);
-    float frs=pow(1.-max(dot(n,v),0.),1.4);
-    float s1=spec(n,l1,v,160.)*.9;
-    float s2=spec(n,l2,v,280.)*.7;
-    float s3=spec(n,l1,v,1800.)*1.0;
-
-    float iFbm=fbm(p*1.2+vec3(t*.05,t*.03,t*.04));
-    col=mix(vec3(.01,.02,.09),vec3(.05,.12,.38),frs*.5+iFbm*.4);
-    col+=vec3(0.,.3,.6)*max(dot(n,l1),0.)*.4;
-    col+=vec3(0.,.2,.45)*max(dot(n,l2),0.)*.3;
-
-    // caustic light
-    float caust=pow((sin(p.x*7.+t*.6)*sin(p.y*5.+t*.45)*.5+.5)*.5,2.0);
-    col+=vec3(0.,.3,.55)*caust*.2*pulse;
-
-    col+=vec3(.4,.65,1.)*s1*pulse;
-    col+=vec3(0.,.9,1.)*s2*.7;
-    col+=vec3(.9,.95,1.)*s3;
-    col+=vec3(0.,.75,1.)*fr*.6*pulse;
-    col+=vec3(.1,.3,1.)*fr*fr*.4;
-
-    float ig=exp(-length(p)*2.2);
-    col+=vec3(.04,.1,.45)*ig*pulse*.7;
-
-    col=pow(col,vec3(.88))*vec3(.85,.92,1.)*(1.-fr*.12);
-    col*=mix(1., .45, u_menu);
-  } else {
-    float d2s=length(uv)-.5;
-    col+=vec3(0.,.1,.3)*exp(-max(d2s,0.)*12.)*.15;
-    col*=mix(1., .3, u_menu);
-  }
-  gl_FragColor=vec4(clamp(col,0.,1.),1.);
-}
-`;
-
-// DESKTOP: full quality shader
-const FS_DESKTOP = `
+<script id="frag" type="x-shader/x-fragment">
 precision highp float;
-uniform float u_time;
-uniform vec2 u_res;
-uniform float u_menu;
-#define TAU 6.28318530717959
-vec3 hash3(vec3 p){p=fract(p*vec3(443.8975,397.2973,491.1871));p+=dot(p.zxy,p.yxz+19.19);return fract(vec3(p.x*p.y,p.y*p.z,p.z*p.x)*2.46);}
-float noise(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(mix(dot(hash3(i+vec3(0,0,0))-.5,f-vec3(0,0,0)),dot(hash3(i+vec3(1,0,0))-.5,f-vec3(1,0,0)),f.x),mix(dot(hash3(i+vec3(0,1,0))-.5,f-vec3(0,1,0)),dot(hash3(i+vec3(1,1,0))-.5,f-vec3(1,1,0)),f.x),f.y),mix(mix(dot(hash3(i+vec3(0,0,1))-.5,f-vec3(0,0,1)),dot(hash3(i+vec3(1,0,1))-.5,f-vec3(1,0,1)),f.x),mix(dot(hash3(i+vec3(0,1,1))-.5,f-vec3(0,1,1)),dot(hash3(i+vec3(1,1,1))-.5,f-vec3(1,1,1)),f.x),f.y),f.z);}
-float fbm(vec3 p){float v=0.,a=0.5;for(int i=0;i<5;i++){v+=a*noise(p);p=p*2.1+vec3(1.7,9.2,3.1);a*=0.5;}return v;}
-mat3 rotY(float a){float c=cos(a),s=sin(a);return mat3(c,0,s,0,1,0,-s,0,c);}
-mat3 rotX(float a){float c=cos(a),s=sin(a);return mat3(1,0,0,0,c,-s,0,s,c);}
-mat3 rotZ(float a){float c=cos(a),s=sin(a);return mat3(c,-s,0,s,c,0,0,0,1);}
-float sdSphere(vec3 p,float r){return length(p)-r;}
-float warp(vec3 p,float t){return fbm(p*1.8+vec3(t*.12,t*.09,t*.07))*.18+fbm(p*2.6-vec3(t*.08,t*.13,t*.05))*.10;}
-float scene(vec3 p,float t){return sdSphere(p,0.72+warp(p,t));}
-float layerScene(vec3 p,float t,float off){vec3 q=p*rotY(t*.04+off)*rotX(t*.025+off*.5);return sdSphere(q,0.54+off*.09+warp(q*.9,t+off*3.)*.8);}
-vec3 calcNormal(vec3 p,float t){vec2 e=vec2(.001,0.);return normalize(vec3(scene(p+e.xyy,t)-scene(p-e.xyy,t),scene(p+e.yxy,t)-scene(p-e.yxy,t),scene(p+e.yyx,t)-scene(p-e.yyx,t)));}
-float caustic(vec3 p,float t){float c=sin(p.x*8.+t*.7)*sin(p.y*6.+t*.5)*.5+.5;c+=sin(p.x*14.-t*.4+p.z*5.)*.25+.25;return pow(c*.5,2.2);}
-float spec(vec3 n,vec3 l,vec3 v,float pw){return pow(max(dot(n,normalize(l+v)),0.),pw);}
-void main(){
-  vec2 uv=(gl_FragCoord.xy/u_res)*2.-1.;
-  float t=u_time;
-  float lev=sin(t*.55)*.028+sin(t*.31)*.012;
-  mat3 gRot=rotY(t*(TAU/25.))*rotX(sin(t*.18)*.15)*rotZ(sin(t*.13)*.06);
-  vec3 ro=vec3(0.,lev,2.4),rd=rotY(sin(t*.07)*.04)*normalize(vec3(uv*.7,-1.));
-  float dist=0.;bool hit=false;vec3 p;
-  for(int i=0;i<96;i++){p=gRot*(ro+rd*dist);float d=scene(p,t);if(d<.0008){hit=true;break;}if(dist>6.)break;dist+=d*.55;}
-  vec3 col=vec3(0.);
-  if(hit){
-    vec3 n=calcNormal(p,t),v=normalize(ro-p);
-    float pulse=.5+.5*sin(t*1.1)*sin(t*.73)*.6+.4,pulse2=.5+.5*sin(t*.8+1.2);
-    vec3 l1=normalize(vec3(-1.2,1.4,1.8)),l2=normalize(vec3(1.8,-.6,1.)),l3=normalize(vec3(0.,-1.5,.8)),l4=normalize(vec3(-.5,.8,-1.));
-    float d1=max(dot(n,l1),0.),d2=max(dot(n,l2),0.),d3=max(dot(n,l3),0.);
-    float s1=spec(n,l1,v,180.)*.9,s2=spec(n,l2,v,320.)*.7,s3=spec(n,l1,v,2200.)*1.1,s4=spec(n,l4,v,90.)*.4;
-    float fr=pow(1.-max(dot(n,v),0.),3.8),frs=pow(1.-max(dot(n,v),0.),1.4);
-    float caust=caustic(p*2.+vec3(0.,0.,t*.06),t);
-    vec3 base=mix(vec3(.01,.02,.09),vec3(.04,.09,.28),frs*.5);
-    float iFbm=fbm(p*1.4+vec3(t*.06,t*.04,t*.05));
-    vec3 inner=mix(vec3(.02,.04,.18),vec3(.08,.18,.55),iFbm);
-    float rN=0.;for(int li=0;li<3;li++){float lo=float(li)*.7;rN+=exp(-abs(layerScene(p,t,lo))*18.)*(0.4-float(li)*.1);}
-    rN=clamp(rN,0.,1.);
-    vec3 rCol=mix(vec3(.05,.12,.5),vec3(.15,.4,.95),rN);
-    col=mix(base,inner,.6)+rCol*rN*.55*pulse2;
-    col+=vec3(.04,.12,.45)*d1*.5+vec3(0.,.25,.45)*d2*.35+vec3(.08,.02,.35)*d3*.25;
-    col+=vec3(0.,.35,.6)*caust*.25*pulse+vec3(.1,.25,.8)*caust*caust*.15;
-    col+=vec3(.4,.65,1.)*s1*pulse+vec3(0.,.9,1.)*s2*.8+vec3(.85,.92,1.)*s3+vec3(.2,.5,1.)*s4*frs;
-    col+=vec3(0.,.75,1.)*fr*.65*(.7+.3*pulse)+vec3(.15,.3,1.)*fr*fr*.45;
-    float ig=exp(-length(p)*2.2);col+=vec3(.05,.1,.5)*ig*pulse*.8+vec3(0.,.2,.6)*ig*ig*.5;
-    float w1=sin(dot(n,vec3(1,0,0))*12.+t*1.4)*.5+.5,w2=sin(dot(n,vec3(0,1,.5))*9.-t*.9+1.)*.5+.5;
-    col+=vec3(0.,.4,.8)*w1*w2*w1*w2*.08;
-    col=pow(col,vec3(.88))*vec3(.85,.92,1.)*(1.-fr*.15);
-    col*=mix(1.,.45,u_menu);
-  } else {
-    float d2s=length(uv)-.52;
-    col+=vec3(0.,.12,.35)*exp(-max(d2s,0.)*14.)*.18+vec3(0.,.05,.15)*exp(-max(d2s,0.)*5.)*.08;
-    col*=mix(1.,.3,u_menu);
-  }
-  gl_FragColor=vec4(clamp(col,0.,1.),1.);
-}
-`;
+uniform vec2  uRes;
+uniform float uTime;
+uniform float uAbsorb;   // 0..1 montée/descente douce au toucher
+uniform float uReduced;  // 1 si l'utilisateur réduit les animations
 
-function compile(type, src) {
-  const s = gl.createShader(type);
-  gl.shaderSource(s, src); gl.compileShader(s);
-  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(s));
+float hash(vec2 p){
+  p = fract(p * vec2(123.34, 456.21));
+  p += dot(p, p + 45.32);
+  return fract(p.x * p.y);
+}
+float vnoise(vec2 p){
+  vec2 i = floor(p); vec2 f = fract(p);
+  f = f*f*(3.0-2.0*f);
+  float a = hash(i);
+  float b = hash(i + vec2(1.0,0.0));
+  float c = hash(i + vec2(0.0,1.0));
+  float d = hash(i + vec2(1.0,1.0));
+  return mix(mix(a,b,f.x), mix(c,d,f.x), f.y);
+}
+float fbm(vec2 p){
+  float s = 0.0; float a = 0.5;
+  for(int i=0;i<5;i++){ s += a*vnoise(p); p *= 2.02; a *= 0.5; }
   return s;
 }
-const prog = gl.createProgram();
-const shaderSrc = isMobile ? FS_MOBILE : FS_DESKTOP;
-gl.attachShader(prog, compile(gl.VERTEX_SHADER, VS));
-gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, shaderSrc));
-gl.linkProgram(prog);
-gl.useProgram(prog);
 
-const buf = gl.createBuffer();
-gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
-const aloc = gl.getAttribLocation(prog, 'a_pos');
-gl.enableVertexAttribArray(aloc);
-gl.vertexAttribPointer(aloc, 2, gl.FLOAT, false, 0, 0);
+void main(){
+  vec2 frag = (gl_FragCoord.xy - 0.5*uRes) / min(uRes.x, uRes.y);
 
-const uTime = gl.getUniformLocation(prog, 'u_time');
-const uRes  = gl.getUniformLocation(prog, 'u_res');
-const uMenu = gl.getUniformLocation(prog, 'u_menu');
+  float reduced = step(0.5, uReduced);
+  // respiration de la masse
+  float breath = (1.0 - reduced) * sin(uTime*0.7) * 0.012;
+  float contract = uAbsorb * -0.018;        // inspiration brève quand on dépose
+  float R = 0.325 + breath + contract;
 
-// Throttle to 30fps on mobile
-let lastFrame = 0;
-const FPS_LIMIT = isMobile ? 30 : 60;
-const FRAME_MS = 1000 / FPS_LIMIT;
+  float r = length(frag);
+  float z = sqrt(max(0.0, R*R - r*r));
+  float edge = 0.0065;
+  float mask = smoothstep(R+edge, R-edge, r);
 
-const start = performance.now();
-function frame(now) {
+  // coordonnées "sphériques" : compression vers le bord pour l'effet enveloppant
+  float zz = max(z/R, 0.06);
+  vec2 suv = vec2(frag.x / zz, frag.y);
+
+  // écoulement des filaments vers le haut
+  float speed = (0.16 + uAbsorb*0.55) * mix(1.0, 0.25, reduced);
+  float t = uTime * speed;
+
+  float s1 = fbm(vec2(suv.x*14.0, suv.y*5.0 - t*3.0));
+  float s2 = fbm(vec2(suv.x*30.0, suv.y*9.0 - t*5.0));
+  float fil = s1*0.65 + s2*0.45;
+
+  // grain fibreux fin
+  float grain = vnoise(vec2(suv.x*120.0, suv.y*60.0 - t*8.0));
+  fil += (grain - 0.5) * 0.18;
+
+  // halo de bord (fresnel) + biais vers le sommet (liseré plus clair)
+  float fres = pow(1.0 - z/R, 2.2);
+  float topbias = smoothstep(-0.12, 0.5, frag.y);
+
+  // TOUTE la sphère est rouge : base élevée et homogène, modulée par les filets
+  float base = 0.92;
+  vec2 core = frag - vec2(0.0, -0.05);
+  float lift = smoothstep(R*1.1, 0.0, length(core)) * 0.16;   // foyer très doux bas-centre
+  float topRim = fres * topbias * 0.22;                       // liseré fibreux en haut
+
+  float intensity = base + (fil - 0.5) * 0.6 + lift + topRim;
+  intensity *= (1.0 + uAbsorb*0.6);                           // absorption au toucher
+
+  // rampe : du rouge sombre au rouge incandescent — jamais de noir à l'intérieur
+  vec3 redDark   = vec3(0.34, 0.018, 0.012);
+  vec3 redBase   = vec3(0.80, 0.055, 0.038);
+  vec3 redBright = vec3(1.0,  0.24,  0.14);
+  vec3 col = mix(redDark, redBase, smoothstep(0.42, 0.95, intensity));
+  col = mix(col, redBright, smoothstep(1.0, 1.45, intensity));
+
+  // arrondi : bord à peine plus sombre, sans jamais virer au noir
+  col *= mix(0.80, 1.0, z/R);
+  col *= mask;
+
+  // halo extérieur dans le noir
+  float halo = exp(-max(0.0, r-R)*9.0)*0.5 + exp(-max(0.0, r-R)*22.0)*0.4;
+  col += vec3(0.5,0.03,0.02) * halo * (1.0-mask) * (1.0 + uAbsorb*0.6);
+
+  // vignette très sombre
+  float vig = smoothstep(1.15, 0.2, r);
+  col += vec3(0.012,0.004,0.006) * vig * (1.0-mask) * (1.0-halo);
+
+  col = pow(col, vec3(0.95));
+  gl_FragColor = vec4(col, 1.0);
+}
+</script>
+
+<script>
+(function(){
+  const canvas = document.getElementById('scene');
+  const fallback = document.querySelector('.fallback');
+  let gl = canvas.getContext('webgl', {antialias:true, alpha:false, premultipliedAlpha:false})
+        || canvas.getContext('experimental-webgl');
+
+  if(!gl){ canvas.style.display='none'; fallback.style.display='flex'; return; }
+
+  function compile(type, src){
+    const sh = gl.createShader(type);
+    gl.shaderSource(sh, src);
+    gl.compileShader(sh);
+    if(!gl.getShaderParameter(sh, gl.COMPILE_STATUS)){
+      console.error(gl.getShaderInfoLog(sh)); return null;
+    }
+    return sh;
+  }
+  const vs = compile(gl.VERTEX_SHADER, document.getElementById('vert').textContent);
+  const fs = compile(gl.FRAGMENT_SHADER, document.getElementById('frag').textContent);
+  if(!vs || !fs){ canvas.style.display='none'; fallback.style.display='flex'; return; }
+
+  const prog = gl.createProgram();
+  gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+  if(!gl.getProgramParameter(prog, gl.LINK_STATUS)){
+    canvas.style.display='none'; fallback.style.display='flex'; return;
+  }
+  gl.useProgram(prog);
+
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+  const aPos = gl.getAttribLocation(prog, 'aPos');
+  gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+  const uRes     = gl.getUniformLocation(prog, 'uRes');
+  const uTime    = gl.getUniformLocation(prog, 'uTime');
+  const uAbsorb  = gl.getUniformLocation(prog, 'uAbsorb');
+  const uReduced = gl.getUniformLocation(prog, 'uReduced');
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1.0 : 0.0;
+  gl.uniform1f(uReduced, reduced);
+
+  let DPR = Math.min(window.devicePixelRatio || 1, 2);
+  function resize(){
+    const w = window.innerWidth, h = window.innerHeight;
+    canvas.style.width = w+'px'; canvas.style.height = h+'px';
+    canvas.width = Math.round(w*DPR); canvas.height = Math.round(h*DPR);
+    gl.viewport(0,0,canvas.width,canvas.height);
+    gl.uniform2f(uRes, canvas.width, canvas.height);
+  }
+  window.addEventListener('resize', resize, {passive:true});
+  resize();
+
+  // interaction : l'agent inspire quand on le touche
+  let absorb = 0, target = 0;
+  function press(){ target = 1; }
+  function release(){ target = 0; }
+  canvas.addEventListener('pointerdown', press);
+  window.addEventListener('pointerup', release);
+  window.addEventListener('pointercancel', release);
+
+  let start = performance.now(), running = true;
+  function frame(now){
+    if(!running) return;
+    const t = (now - start) / 1000;
+    absorb += (target - absorb) * 0.08;   // lissage doux -> jamais brusque
+    gl.uniform1f(uTime, t);
+    gl.uniform1f(uAbsorb, absorb);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    requestAnimationFrame(frame);
+  }
   requestAnimationFrame(frame);
-  if (now - lastFrame < FRAME_MS) return;
-  lastFrame = now;
-  const t = (now - start) / 1000;
-  gl.uniform1f(uTime, t);
-  gl.uniform2f(uRes, canvas.width, canvas.height);
-  gl.uniform1f(uMenu, menuOpen ? 1.0 : 0.0);
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-}
-requestAnimationFrame(frame);
 
-/* ── MENU ── */
-function openMenu() {
-  menuOpen = true;
-  canvas.classList.add('menu-open');
-  document.getElementById('halo-wrap').classList.add('menu-open');
-  const menu = document.getElementById('menu');
-  menu.classList.add('visible');
-  document.querySelectorAll('.menu-item').forEach((el, i) => {
-    setTimeout(() => el.classList.add('show'), 80 + i * 60);
+  // on met l'animation en pause hors écran -> batterie + fluidité
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.hidden){ running = false; }
+    else if(!running){ running = true; start = performance.now() - 0; requestAnimationFrame(frame); }
   });
-}
-function closeMenu() {
-  menuOpen = false;
-  canvas.classList.remove('menu-open');
-  document.getElementById('halo-wrap').classList.remove('menu-open');
-  document.getElementById('menu').classList.remove('visible');
-  document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('show'));
-}
-
-let touchMoved = false;
-canvas.addEventListener('touchstart', () => { touchMoved = false; }, { passive: true });
-canvas.addEventListener('touchmove', () => { touchMoved = true; }, { passive: true });
-canvas.addEventListener('touchend', (e) => {
-  if (touchMoved) return;
-  e.preventDefault();
-  menuOpen ? closeMenu() : openMenu();
-}, { passive: false });
-canvas.addEventListener('click', () => { menuOpen ? closeMenu() : openMenu(); });
-
-document.getElementById('close-hint').addEventListener('click', closeMenu);
-document.getElementById('close-hint').addEventListener('touchend', (e) => { e.preventDefault(); closeMenu(); }, { passive: false });
-
-function selectItem(el) {
-  document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
-  el.classList.add('active');
-  setTimeout(() => closeMenu(), 400);
-}
+})();
 </script>
 </body>
 </html>
