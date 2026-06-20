@@ -193,13 +193,15 @@
   .section-title{display:flex;align-items:center;gap:10px;margin:28px 2px 14px;font-size:17px;font-weight:800}
   .section-title .count{font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-50);padding:3px 9px;border-radius:999px}
 
-  .active-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:18px}
-  .sess{background:var(--card);border:1.5px solid var(--accent-50);border-radius:var(--r);box-shadow:var(--shadow);padding:18px;display:flex;flex-direction:column;gap:13px}
+  .active-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:18px}
+  @media(max-width:560px){.active-grid{grid-template-columns:1fr}}
+  .sess{background:var(--card);border:1.5px solid var(--accent-50);border-radius:var(--r);box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:14px}
   .sess-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
   .sess-top .plt{font-weight:800;font-size:15px;margin-top:6px}
   .sess-net{font-size:23px;font-weight:800;letter-spacing:-.02em}
   .sess-net.gain{color:var(--green)}.sess-net.perte{color:var(--red)}.sess-net.flat{color:var(--ink)}
-  .sess-meta{font-size:12px;color:var(--muted);font-weight:600;display:flex;gap:8px;flex-wrap:wrap}
+  .sess-meta{font-size:12px;color:var(--muted);font-weight:600;display:flex;gap:6px 8px;flex-wrap:wrap;line-height:1.6}
+  .sess-meta b{color:var(--ink)}
   .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:11.5px;font-weight:700}
   .badge.open{background:var(--accent-50);color:var(--accent)}.badge.closed{background:var(--bg-2);color:var(--muted)}
   .badge .live{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 1.6s infinite}
@@ -212,9 +214,11 @@
   .txrow .tjeu{font-weight:700;font-size:13px}.txrow .ttime{font-size:11px;color:var(--muted)}
   .txrow .tsp{flex:1}.txrow .tamt{font-weight:800;font-size:13.5px}.txrow .tamt.gain{color:var(--green)}.txrow .tamt.perte{color:var(--red)}
   .txempty{padding:14px 2px;color:var(--muted);font-size:12.5px;text-align:center}
-  .addtx{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center}
-  .addtx .row1{display:flex;gap:8px}
-  .seg-mini{display:inline-flex;background:var(--bg-2);border-radius:9px;padding:3px;gap:3px;flex:none}
+  .addtx{display:flex;flex-direction:column;gap:8px;background:var(--bg-2);padding:11px;border-radius:12px}
+  .atx-line{display:flex;gap:8px;align-items:center}
+  .atx-line .field{flex:1;min-width:0}
+  .atx-line .btn{flex:none}
+  .seg-mini{display:inline-flex;background:var(--card);border-radius:9px;padding:3px;gap:3px;flex:none}
   .seg-mini button{padding:7px 12px;border-radius:7px;font-weight:700;font-size:12.5px;color:var(--muted);background:transparent}
   .seg-mini button.on[data-tg="gain"]{background:var(--card);color:var(--green)}
   .seg-mini button.on[data-tg="perte"]{background:var(--card);color:var(--red)}
@@ -308,6 +312,21 @@
   .theme-seg button.on{background:var(--accent-50);border-color:var(--accent);color:var(--accent)}
   .set-note{font-size:12px;color:var(--muted);line-height:1.6;background:var(--bg-2);padding:13px 15px;border-radius:12px}
 
+  /* ---- tags & cashouts ---- */
+  .optag{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700}
+  .optag.gain{background:var(--green-bg);color:var(--green)}
+  .optag.perte{background:var(--red-bg);color:var(--red)}
+  .optag.depot{background:var(--accent-50);color:var(--accent)}
+  .optag.cashout{background:var(--amber-bg);color:var(--amber)}
+  .led-filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+  @media(max-width:560px){.stat3{grid-template-columns:1fr}}
+  .stat3 .cb .v.amber{color:var(--amber)}
+  .check{width:22px;height:22px;border-radius:7px;border:2px solid var(--line-2);background:var(--bg-2);display:grid;place-items:center;cursor:pointer;transition:.12s;color:transparent}
+  .check.on{background:var(--accent);border-color:var(--accent);color:#04231b}
+  .check svg{width:13px;height:13px}
+  .pointed-row.done td{opacity:.55}
+
   footer{margin-top:28px;text-align:center;font-size:12px;color:var(--muted);line-height:1.7;opacity:.85}
   *:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   @media(prefers-reduced-motion:reduce){*{animation:none!important}.load-bar>i,.progress>i{transition:none!important}}
@@ -324,6 +343,7 @@
       <a class="nav-item" data-go="analytics"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l5-6 4 4 6-8"/><path d="M3 21h18"/></svg>Analyses</a>
       <a class="nav-item" data-go="sessions"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>Sessions<span class="pill" id="navSessCount"></span></a>
       <a class="nav-item" data-go="wallet"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20"/></svg>Plateformes</a>
+      <a class="nav-item" data-go="cashouts"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7 7 7-7"/><path d="M3 21h18"/></svg>Cashouts<span class="pill" id="navCashCount"></span></a>
       <div class="nav-sec">Gestion</div>
       <a class="nav-item" id="navOpen"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>Ouvrir une session</a>
       <a class="nav-item" id="navExport"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l4-4m-4 4l-4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>Exporter (CSV)</a>
@@ -406,6 +426,16 @@
         </section>
       </div>
 
+      <section class="card" data-views="wallet" id="platLedgerCard">
+        <div class="tx-head"><h2>Historique des transactions</h2>
+          <div class="led-filters">
+            <select class="field" id="plFiltPlat" aria-label="Plateforme"><option value="">Toutes les plateformes</option></select>
+            <select class="field" id="plFiltType" aria-label="Type"><option value="">Tous types</option><option value="gain">Gains</option><option value="perte">Pertes</option><option value="depot">Dépôts</option><option value="cashout">Cashouts</option></select>
+          </div>
+        </div>
+        <div id="platLedgerBody"></div>
+      </section>
+
       <div class="grid-2" data-views="overview analytics">
         <section class="card goal">
           <div class="card-h" style="justify-content:space-between"><span style="display:inline-flex;align-items:center;gap:9px"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></span>Objectif du mois</span>
@@ -437,6 +467,22 @@
         </div>
       </div>
       <div id="historyBody"></div>
+    </section>
+
+    <section class="card" data-views="cashouts" style="display:none">
+      <div class="stat3">
+        <div class="cb"><div class="k">Total cashout</div><div class="v num amber" id="coTotal">0 €</div></div>
+        <div class="cb"><div class="k">Pointé (reçu)</div><div class="v num" id="coDone" style="color:var(--green)">0 €</div></div>
+        <div class="cb"><div class="k">Reste à pointer</div><div class="v num" id="coLeft">0 €</div></div>
+      </div>
+      <div class="tx-head"><h2>Historique des cashouts</h2>
+        <div class="led-filters">
+          <select class="field" id="coFiltPlat" aria-label="Plateforme"><option value="">Toutes les plateformes</option></select>
+          <select class="field" id="coFiltPeriod" aria-label="Période"><option value="all">Toutes dates</option><option value="month">Ce mois-ci</option><option value="3m">3 derniers mois</option><option value="year">Cette année</option></select>
+          <select class="field" id="coFiltStat" aria-label="Pointage"><option value="">Tous</option><option value="done">Pointés</option><option value="todo">À pointer</option></select>
+        </div>
+      </div>
+      <div id="cashoutBody"></div>
     </section>
 
     <section class="card settings-panel" data-views="settings" style="display:none">
@@ -532,8 +578,15 @@
   const totDepot=()=>data.movements.filter(m=>m.type==='depot').reduce((a,m)=>a+m.montant,0);
   const totCashout=()=>data.movements.filter(m=>m.type==='cashout').reduce((a,m)=>a+m.montant,0);
   function recordMovement(type,name,montant,note){const p=ensurePlat(name);
-    data.movements.push({id:uid(),platformId:p.id,platformName:p.name,type,montant:Math.round(montant*100)/100,time:new Date().toISOString(),note:note||''});
+    data.movements.push({id:uid(),platformId:p.id,platformName:p.name,type,montant:Math.round(montant*100)/100,time:new Date().toISOString(),note:note||'',reconciled:false});
     applyBal(p.id,type==='depot'?montant:-montant);save();renderAll();}
+  function editMovement(id,type,name,montant,note){const m=data.movements.find(x=>x.id===id);if(!m)return;
+    applyBal(m.platformId,m.type==='depot'?-m.montant:+m.montant);
+    const p=ensurePlat(name);m.platformId=p.id;m.platformName=p.name;m.type=type;m.montant=Math.round(montant*100)/100;m.note=note||'';
+    applyBal(p.id,type==='depot'?montant:-montant);save();renderAll();}
+  function delMovement(id){const m=data.movements.find(x=>x.id===id);if(!m)return;if(!confirm('Supprimer ce mouvement ?'))return;
+    applyBal(m.platformId,m.type==='depot'?-m.montant:+m.montant);data.movements=data.movements.filter(x=>x.id!==id);save();renderAll();}
+  function toggleReconciled(id){const m=data.movements.find(x=>x.id===id);if(!m)return;m.reconciled=!m.reconciled;save();renderCashouts();}
   function addPlatform(){const name=prompt('Nom de la plateforme ou de l\'établissement :');if(!name)return;
     if(data.platforms.some(p=>p.name.toLowerCase()===name.trim().toLowerCase())){alert('Cette plateforme existe déjà.');return;}
     data.platforms.push({id:uid(),name:name.trim(),balance:0});save();renderAll();}
@@ -570,6 +623,70 @@
     $('#barReco').style.width=(Math.max(0,reco)/max*100)+'%';$('#vReco').textContent=fmt(reco);
     const r=$('#cbResult');r.textContent=sign(result);r.className='res num '+cls(result);
   }
+
+  // ---- historique complet par plateforme ----
+  const TYPE_LABEL={gain:'Gain',perte:'Perte',depot:'Dépôt',cashout:'Cashout'};
+  const TYPE_SIGN={gain:1,perte:-1,depot:1,cashout:-1};
+  function allEntries(){const out=[];
+    data.sessions.forEach(s=>s.txns.forEach(t=>out.push({kind:'txn',sid:s.id,id:t.id,time:t.time,platformId:s.platformId,platformName:s.platformName,type:t.type,jeu:t.jeu,montant:+t.montant,note:t.note})));
+    data.movements.forEach(m=>out.push({kind:'mov',id:m.id,time:m.time,platformId:m.platformId,platformName:m.platformName,type:m.type,jeu:'',montant:+m.montant,note:m.note}));
+    return out;}
+  function fillPlatOptions(sel,cur){sel.innerHTML='<option value="">Toutes les plateformes</option>'+data.platforms.map(p=>`<option value="${p.id}" ${p.id===cur?'selected':''}>${esc(p.name)}</option>`).join('');}
+  function renderPlatformLedger(){
+    fillPlatOptions($('#plFiltPlat'),$('#plFiltPlat').value);
+    const fp=$('#plFiltPlat').value,ft=$('#plFiltType').value;
+    let rows=allEntries().filter(e=>(!fp||e.platformId===fp)&&(!ft||e.type===ft)).sort((a,b)=>(b.time||'').localeCompare(a.time||''));
+    const box=$('#platLedgerBody');
+    if(!rows.length){box.innerHTML=`<div class="empty"><h3>Aucune transaction</h3><p>Les gains, pertes, dépôts et cashouts de vos plateformes apparaîtront ici.</p></div>`;return;}
+    box.innerHTML=`<table><thead><tr><th>Date</th><th>Plateforme</th><th>Opération</th><th class="r">Montant</th><th class="r"></th></tr></thead><tbody>${rows.map(e=>{const sgn=TYPE_SIGN[e.type],c=sgn>0?'gain':'perte';return`<tr>
+      <td class="num" style="color:var(--muted);font-size:13px">${dateFR(e.time)} ${timeFR(e.time)}</td>
+      <td style="font-weight:600">${esc(e.platformName)}</td>
+      <td><span class="optag ${e.type}">${TYPE_LABEL[e.type]}</span>${e.jeu?` <span style="color:var(--muted);font-size:12px">${esc(e.jeu)}</span>`:''}${e.note?` <span style="color:var(--muted);font-size:12px">· ${esc(e.note)}</span>`:''}</td>
+      <td class="r num amt ${c}">${sgn>0?'+':'–'} ${money(e.montant)}</td>
+      <td class="r"><span style="display:inline-flex;gap:4px">
+        <button class="iconbtn" data-led-edit="${e.kind}:${e.kind==='txn'?e.sid+':'+e.id:e.id}" title="Modifier"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button>
+        <button class="iconbtn del" data-led-del="${e.kind}:${e.kind==='txn'?e.sid+':'+e.id:e.id}" title="Supprimer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button>
+      </span></td></tr>`;}).join('')}</tbody></table>`;
+  }
+  $('#platLedgerBody').addEventListener('click',e=>{
+    const ed=e.target.closest('[data-led-edit]'),dl=e.target.closest('[data-led-del]');
+    if(ed){const[k,...r]=ed.dataset.ledEdit.split(':');if(k==='txn')editTxnModal(r[0],r[1]);else openMovementModal(null,null,r[0]);}
+    if(dl){const[k,...r]=dl.dataset.ledDel.split(':');if(k==='txn')delTxn(r[0],r[1]);else delMovement(r[0]);}
+  });
+  $('#plFiltPlat').addEventListener('change',renderPlatformLedger);
+  $('#plFiltType').addEventListener('change',renderPlatformLedger);
+
+  // ---- vue cashouts ----
+  function renderCashouts(){
+    fillPlatOptions($('#coFiltPlat'),$('#coFiltPlat').value);
+    $('#navCashCount').textContent=data.movements.filter(m=>m.type==='cashout').length||'';
+    const fp=$('#coFiltPlat').value,per=$('#coFiltPeriod').value,fs=$('#coFiltStat').value,r=ranges(per);
+    let list=data.movements.filter(m=>m.type==='cashout');
+    const totAll=list.reduce((a,m)=>a+m.montant,0),done=list.filter(m=>m.reconciled).reduce((a,m)=>a+m.montant,0);
+    $('#coTotal').textContent=fmt(totAll);$('#coDone').textContent=fmt(done);$('#coLeft').textContent=fmt(totAll-done);
+    list=list.filter(m=>{if(fp&&m.platformId!==fp)return false;if(r){const d=new Date(m.time);if(!(d>=r.f&&d<r.t))return false;}
+      if(fs==='done'&&!m.reconciled)return false;if(fs==='todo'&&m.reconciled)return false;return true;})
+      .sort((a,b)=>(b.time||'').localeCompare(a.time||''));
+    const box=$('#cashoutBody');
+    if(!list.length){box.innerHTML=`<div class="empty"><h3>Aucun cashout</h3><p>Enregistrez un cashout depuis « Plateformes » ; il apparaîtra ici pour pointer le virement reçu.</p></div>`;return;}
+    box.innerHTML=`<table><thead><tr><th style="width:46px">Reçu</th><th>Date</th><th>Plateforme</th><th>Note</th><th class="r">Montant</th><th class="r"></th></tr></thead><tbody>${list.map(m=>`<tr class="pointed-row ${m.reconciled?'done':''}">
+      <td><button class="check ${m.reconciled?'on':''}" data-co-check="${m.id}" title="${m.reconciled?'Pointé':'À pointer'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></button></td>
+      <td class="num" style="color:var(--muted);font-size:13px">${dateFR(m.time)} ${timeFR(m.time)}</td>
+      <td style="font-weight:600">${esc(m.platformName)}</td>
+      <td style="color:var(--muted);font-size:13px">${esc(m.note||'—')}</td>
+      <td class="r num amt perte">– ${money(m.montant)}</td>
+      <td class="r"><span style="display:inline-flex;gap:4px">
+        <button class="iconbtn" data-co-edit="${m.id}" title="Modifier"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button>
+        <button class="iconbtn del" data-co-del="${m.id}" title="Supprimer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button>
+      </span></td></tr>`).join('')}</tbody></table>`;
+  }
+  $('#cashoutBody').addEventListener('click',e=>{
+    const ck=e.target.closest('[data-co-check]'),ed=e.target.closest('[data-co-edit]'),dl=e.target.closest('[data-co-del]');
+    if(ck)toggleReconciled(ck.dataset.coCheck);
+    if(ed)openMovementModal(null,null,ed.dataset.coEdit);
+    if(dl)delMovement(dl.dataset.coDel);
+  });
+  ['#coFiltPlat','#coFiltPeriod','#coFiltStat'].forEach(s=>$(s).addEventListener('change',renderCashouts));
 
   // ---- agrégats ----
   function allTxns(){const o=[];data.sessions.forEach(s=>s.txns.forEach(t=>o.push(t)));return o;}
@@ -668,7 +785,7 @@
     return[...s.txns].reverse().map(t=>`<div class="txrow"><span class="tic ${t.type}">${t.type==='gain'?'♠':'♦'}</span>
       <div><div class="tjeu">${esc(t.jeu||'Jeu')}</div><div class="ttime">${timeFR(t.time)}</div></div>
       <span class="tsp"></span><span class="tamt ${t.type}">${t.type==='gain'?'+':'–'} ${money(+t.montant)}</span>
-      ${deletable?`<button class="iconbtn del" data-deltx="${t.id}" data-sid="${s.id}" title="Supprimer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button>`:''}</div>`).join('');
+      ${deletable?`<button class="iconbtn" data-edittx="${t.id}" data-sid="${s.id}" title="Modifier"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button><button class="iconbtn del" data-deltx="${t.id}" data-sid="${s.id}" title="Supprimer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button>`:''}</div>`).join('');
   }
   function renderActive(){
     const open=data.sessions.filter(s=>s.status==='open');
@@ -677,8 +794,8 @@
       <div class="sess-top"><div><span class="badge open"><span class="live"></span>En cours</span><div class="plt">${esc(s.platformName)}</div></div><div class="sess-net ${cls(net)} num">${signM(net)}</div></div>
       <div class="sess-meta"><span>Ouverte ${fromNow(s.openedAt)}</span><span>·</span><span>${s.txns.length} transaction${s.txns.length>1?'s':''}</span><span>·</span><span>Reste : <b style="color:var(--ink)">${money(p?p.balance:0)}</b></span></div>
       <div class="txlist">${txRows(s,true)}</div>
-      <div class="addtx" data-sid="${s.id}"><div class="row1"><input class="field atx-jeu" list="jeuList" placeholder="Jeu (ex. Blackjack)"><div class="seg-mini"><button type="button" data-tg="gain" class="on">Gain</button><button type="button" data-tg="perte">Perte</button></div></div>
-        <input class="field atx-amt" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Montant €" style="max-width:120px"><button class="btn btn-teal btn-sm" data-act="addtxn">+ Ajouter</button></div>
+      <div class="addtx" data-sid="${s.id}"><div class="atx-line"><input class="field atx-jeu" list="jeuList" placeholder="Jeu (ex. Blackjack)"><div class="seg-mini"><button type="button" data-tg="gain" class="on">Gain</button><button type="button" data-tg="perte">Perte</button></div></div>
+        <div class="atx-line"><input class="field atx-amt" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Montant €"><button class="btn btn-teal btn-sm" data-act="addtxn">+ Ajouter</button></div></div>
       <div class="sess-foot"><button class="btn btn-outline btn-sm" data-act="detail">Détail</button><span class="sp"></span><button class="btn btn-teal btn-sm" data-act="close">✓ Clôturer</button>
         <button class="iconbtn del" data-act="del" title="Supprimer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button></div></div>`;}).join('');
     updateActive();
@@ -689,6 +806,7 @@
     const card=e.target.closest('.sess');if(!card)return;const sid=card.dataset.sid;
     const tg=e.target.closest('[data-tg]');if(tg){card.querySelectorAll('.seg-mini button').forEach(b=>b.classList.remove('on'));tg.classList.add('on');return;}
     const dx=e.target.closest('[data-deltx]');if(dx){delTxn(dx.dataset.sid,dx.dataset.deltx);return;}
+    const ex=e.target.closest('[data-edittx]');if(ex){editTxnModal(ex.dataset.sid,ex.dataset.edittx);return;}
     const act=e.target.closest('[data-act]');if(!act)return;const a=act.dataset.act;
     if(a==='addtxn'){const jeu=card.querySelector('.atx-jeu').value.trim(),amt=parseFloat(card.querySelector('.atx-amt').value),type=card.querySelector('.seg-mini button.on').dataset.tg;
       if(isNaN(amt)||amt<=0){card.querySelector('.atx-amt').focus();return;}addTxn(sid,jeu,type,amt);}
@@ -723,6 +841,7 @@
     const tg=e.target.closest('[data-tg]');if(tg){const seg=tg.closest('.seg-mini');seg.querySelectorAll('button').forEach(x=>x.classList.remove('on'));tg.classList.add('on');return;}
     if(!detailId)return;
     const dx=e.target.closest('[data-deltx]');if(dx){delTxn(dx.dataset.sid,dx.dataset.deltx);openDetail(detailId);return;}
+    const ex=e.target.closest('[data-edittx]');if(ex){editTxnModal(ex.dataset.sid,ex.dataset.edittx);return;}
     const act=e.target.closest('[data-act]');if(!act)return;const a=act.dataset.act;
     if(a==='addtxn'){const jeu=host.querySelector('.atx-jeu').value.trim(),amt=parseFloat(host.querySelector('.atx-amt').value),type=host.querySelector('.seg-mini button.on').dataset.tg;
       if(isNaN(amt)||amt<=0){host.querySelector('.atx-amt').focus();return;}addTxn(detailId,jeu,type,amt);openDetail(detailId);}
@@ -745,23 +864,42 @@
     host.querySelector('#osGo').addEventListener('click',()=>{const name=pi.value.trim();if(!name){pi.focus();return;}
       const bal=host.querySelector('#osBal').value?Math.max(0,parseFloat(host.querySelector('#osBal').value)||0):0;openSession(name,bal,host.querySelector('#osNote').value.trim());closeOverlay();});}
 
-  function openMovementModal(type,platName){detailId=null;const names=data.platforms.map(p=>p.name);
-    host.innerHTML=`<div class="modal-head"><h2>Dépôt / Cashout</h2><button class="iconbtn" data-close><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  function openMovementModal(type,platName,movId){detailId=null;const names=data.platforms.map(p=>p.name);
+    const mv=movId?data.movements.find(x=>x.id===movId):null;
+    if(mv){type=mv.type;platName=mv.platformName;}
+    host.innerHTML=`<div class="modal-head"><h2>${mv?'Modifier le mouvement':'Dépôt / Cashout'}</h2><button class="iconbtn" data-close><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
       <div class="modal-body">
         <div class="seg" id="mvSeg"><button type="button" data-v="depot" class="${type==='depot'?'on':''}">↑ Dépôt</button><button type="button" data-v="cashout" class="${type==='cashout'?'on':''}">↓ Cashout</button></div>
         <input type="hidden" id="mvType" value="${type}">
         <label class="fld">Plateforme<input id="mvPlat" list="platNames2" placeholder="Winamax…" value="${esc(platName||'')}"><datalist id="platNames2">${names.map(n=>`<option>${esc(n)}</option>`).join('')}</datalist><span class="hint" id="mvHint"></span></label>
-        <label class="fld">Montant (€)<input id="mvAmt" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00"></label>
-        <label class="fld">Note <span class="opt">— optionnel</span><textarea id="mvNote" placeholder="Virement, bonus…"></textarea></label>
+        <label class="fld">Montant (€)<input id="mvAmt" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00" value="${mv?mv.montant:''}"></label>
+        <label class="fld">Note <span class="opt">— optionnel</span><textarea id="mvNote" placeholder="Virement, bonus…">${mv?esc(mv.note):''}</textarea></label>
       </div>
-      <div class="modal-foot"><button class="btn btn-quiet" data-close>Annuler</button><button class="btn btn-teal" id="mvGo">Enregistrer</button></div>`;
+      <div class="modal-foot">${mv?'<button class="btn btn-danger" id="mvDel">Supprimer</button>':''}<span class="sp"></span><button class="btn btn-quiet" data-close>Annuler</button><button class="btn btn-teal" id="mvGo">Enregistrer</button></div>`;
     openOverlay();
     host.querySelectorAll('#mvSeg button').forEach(b=>b.addEventListener('click',()=>{host.querySelectorAll('#mvSeg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');host.querySelector('#mvType').value=b.dataset.v;}));
     const pi=host.querySelector('#mvPlat');
     const upd=()=>{const p=data.platforms.find(x=>x.name.toLowerCase()===pi.value.trim().toLowerCase());host.querySelector('#mvHint').textContent=p?`Solde actuel : ${money(p.balance)}`:'';};
-    pi.addEventListener('input',upd);upd();(platName?host.querySelector('#mvAmt'):pi).focus();
+    pi.addEventListener('input',upd);upd();((platName||mv)?host.querySelector('#mvAmt'):pi).focus();
+    if(mv)host.querySelector('#mvDel').addEventListener('click',()=>{delMovement(mv.id);closeOverlay();});
     host.querySelector('#mvGo').addEventListener('click',()=>{const name=pi.value.trim();if(!name){pi.focus();return;}const amt=parseFloat(host.querySelector('#mvAmt').value);if(isNaN(amt)||amt<=0){host.querySelector('#mvAmt').focus();return;}
-      recordMovement(host.querySelector('#mvType').value,name,amt,host.querySelector('#mvNote').value.trim());closeOverlay();});}
+      const t=host.querySelector('#mvType').value,note=host.querySelector('#mvNote').value.trim();
+      if(mv)editMovement(mv.id,t,name,amt,note);else recordMovement(t,name,amt,note);closeOverlay();});}
+
+  function editTxnModal(sid,tid){const s=data.sessions.find(x=>x.id===sid);if(!s)return;const t=s.txns.find(x=>x.id===tid);if(!t)return;detailId=null;
+    host.innerHTML=`<div class="modal-head"><h2>Modifier la transaction</h2><button class="iconbtn" data-close><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <div class="modal-body">
+        <div class="seg-mini" style="align-self:start"><button type="button" data-tg="gain" class="${t.type==='gain'?'on':''}">Gain</button><button type="button" data-tg="perte" class="${t.type==='perte'?'on':''}">Perte</button></div>
+        <label class="fld">Jeu<input id="etJeu" list="jeuList" value="${esc(t.jeu)}" placeholder="Blackjack…"></label>
+        <label class="fld">Montant (€)<input id="etAmt" type="number" min="0" step="0.01" inputmode="decimal" value="${t.montant}"></label>
+      </div>
+      <div class="modal-foot"><button class="btn btn-danger" id="etDel">Supprimer</button><span class="sp"></span><button class="btn btn-quiet" data-close>Annuler</button><button class="btn btn-teal" id="etGo">Enregistrer</button></div>`;
+    openOverlay();host.querySelector('#etAmt').focus();
+    host.querySelector('#etDel').addEventListener('click',()=>{delTxn(sid,tid);closeOverlay();});
+    host.querySelector('#etGo').addEventListener('click',()=>{const type=host.querySelector('.seg-mini button.on').dataset.tg,jeu=host.querySelector('#etJeu').value.trim(),amt=parseFloat(host.querySelector('#etAmt').value);
+      if(isNaN(amt)||amt<=0){host.querySelector('#etAmt').focus();return;}
+      applyBal(s.platformId,t.type==='gain'?-t.montant:+t.montant);t.type=type;t.jeu=jeu;t.montant=Math.round(amt*100)/100;applyBal(s.platformId,type==='gain'?+t.montant:-t.montant);
+      save();renderAll();closeOverlay();});}
 
   function openDetail(id){const s=data.sessions.find(x=>x.id===id);if(!s)return;detailId=id;const net=sessNet(s),p=getPlat(s.platformId);
     host.innerHTML=`<div class="modal-head"><h2>${esc(s.platformName)}</h2><button class="iconbtn" data-close><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
@@ -770,7 +908,7 @@
         <div class="detail-meta"><span>Ouverte <b>${dateFR(s.openedAt)} ${timeFR(s.openedAt)}</b></span>${s.closedAt?`<span>Clôturée <b>${dateFR(s.closedAt)} ${timeFR(s.closedAt)}</b></span>`:''}<span>Reste sur la plateforme <b>${money(p?p.balance:0)}</b></span></div>
         ${s.note?`<div style="font-size:13px;color:var(--muted);background:var(--bg-2);padding:11px 13px;border-radius:11px">${esc(s.note)}</div>`:''}
         <div><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px">TRANSACTIONS (${s.txns.length})</div><div class="txlist" style="max-height:240px">${txRows(s,true)}</div></div>
-        ${s.status==='open'?`<div class="addtx" data-sid="${s.id}"><div class="row1"><input class="field atx-jeu" list="jeuList" placeholder="Jeu"><div class="seg-mini"><button type="button" data-tg="gain" class="on">Gain</button><button type="button" data-tg="perte">Perte</button></div></div><input class="field atx-amt" type="number" min="0" step="0.01" placeholder="Montant €" style="max-width:120px"><button class="btn btn-teal btn-sm" data-act="addtxn">+ Ajouter</button></div>`:''}
+        ${s.status==='open'?`<div class="addtx" data-sid="${s.id}"><div class="atx-line"><input class="field atx-jeu" list="jeuList" placeholder="Jeu"><div class="seg-mini"><button type="button" data-tg="gain" class="on">Gain</button><button type="button" data-tg="perte">Perte</button></div></div><div class="atx-line"><input class="field atx-amt" type="number" min="0" step="0.01" placeholder="Montant €"><button class="btn btn-teal btn-sm" data-act="addtxn">+ Ajouter</button></div></div>`:''}
       </div>
       <div class="modal-foot"><button class="btn btn-danger" data-act="del">Supprimer</button><span class="sp"></span>${s.status==='open'?`<button class="btn btn-teal" data-act="close">Clôturer</button>`:`<button class="btn btn-outline" data-act="ticket"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>Ticket</button><button class="btn btn-quiet" data-act="reopen">Rouvrir</button>`}</div>`;
     openOverlay();}
@@ -853,7 +991,7 @@
   $('#setReset').addEventListener('click',resetData);
 
   // ---- navigation par vues ----
-  const titles={overview:["Vue d'ensemble","Votre tableau de jeu en un coup d'œil"],analytics:["Analyses","Vos performances, en détail"],sessions:["Sessions","Vos parties, en cours et passées"],wallet:["Plateformes","L'argent en jeu et vos mouvements"],settings:["Paramètres","Votre compte et vos données"]};
+  const titles={overview:["Vue d'ensemble","Votre tableau de jeu en un coup d'œil"],analytics:["Analyses","Vos performances, en détail"],sessions:["Sessions","Vos parties, en cours et passées"],wallet:["Plateformes","L'argent en jeu, vos mouvements et l'historique"],cashouts:["Cashouts","Vos retraits — pointez les virements reçus"],settings:["Paramètres","Votre compte et vos données"]};
   function showView(v){
     current=v;
     document.querySelectorAll('[data-views]').forEach(el=>{el.style.display=el.dataset.views.split(' ').includes(v)?'':'none';});
@@ -872,7 +1010,7 @@
   $('#period').addEventListener('change',renderTop);
   ['#search','#fltStat'].forEach(s=>$(s).addEventListener('input',renderHistory));
 
-  function renderAll(){renderTop();renderArea();renderPlatforms();renderCashbox();renderGoal();renderActive();renderHistory();renderRecent();}
+  function renderAll(){renderTop();renderArea();renderPlatforms();renderCashbox();renderPlatformLedger();renderCashouts();renderGoal();renderActive();renderHistory();renderRecent();}
   renderAll();showView('overview');
 })();
 </script>
