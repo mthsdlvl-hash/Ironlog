@@ -65,7 +65,13 @@
   .recent-item .rname{font-size:12.5px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink-2)}
   .recent-item .rnet{font-size:12px;font-weight:800}
   .rnet.gain{color:var(--green)}.rnet.perte{color:var(--red)}.rnet.flat{color:var(--muted)}
-  .side-user{margin-top:auto;display:flex;align-items:center;gap:11px;padding:12px 8px 4px;border-top:1px solid var(--card-bd)}
+  .side-user{margin-top:auto;display:flex;align-items:center;gap:11px;padding:11px 9px;border-top:1px solid var(--card-bd);width:100%;background:transparent;border-left:none;border-right:none;border-bottom:none;text-align:left;border-radius:0;transition:.12s;cursor:pointer}
+  .side-user:hover{background:var(--bg-2)}
+  .su-info{flex:1;min-width:0}
+  .su-name{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .su-sub{font-size:11px;color:var(--muted);font-weight:600}
+  .su-gear{color:var(--muted);flex:none}
+  .side-user:hover .su-gear{color:var(--ink)}
   .avatar{width:36px;height:36px;border-radius:11px;background:var(--accent-grad);color:#04231b;display:grid;place-items:center;font-weight:700;font-size:14px;flex:none}
   .su-name{font-size:13px;font-weight:700;outline:none;border-bottom:1px dashed transparent;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-transform:uppercase;letter-spacing:.02em}
   .su-name:hover,.su-name:focus{border-bottom-color:var(--line-2)}
@@ -291,6 +297,17 @@
     @page{margin:8mm}
   }
 
+  /* ---- paramètres ---- */
+  .settings-panel{max-width:760px}
+  .set-block{margin-bottom:22px}
+  .set-block-h{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:6px}
+  .set-row{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px 0;border-bottom:1px solid var(--line)}
+  .set-row:last-child{border-bottom:none}
+  .set-t{font-weight:700;font-size:14px}
+  .set-d{font-size:12.5px;color:var(--muted);margin-top:3px;max-width:420px;line-height:1.5}
+  .theme-seg button.on{background:var(--accent-50);border-color:var(--accent);color:var(--accent)}
+  .set-note{font-size:12px;color:var(--muted);line-height:1.6;background:var(--bg-2);padding:13px 15px;border-radius:12px}
+
   footer{margin-top:28px;text-align:center;font-size:12px;color:var(--muted);line-height:1.7;opacity:.85}
   *:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   @media(prefers-reduced-motion:reduce){*{animation:none!important}.load-bar>i,.progress>i{transition:none!important}}
@@ -303,9 +320,9 @@
     <div class="side-brand"><span class="mark">♣</span> Tapis Vert</div>
     <nav>
       <div class="nav-sec">Menu</div>
-      <a class="nav-item active" data-go="top"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Vue d'ensemble</a>
+      <a class="nav-item active" data-go="overview"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Vue d'ensemble</a>
       <a class="nav-item" data-go="analytics"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l5-6 4 4 6-8"/><path d="M3 21h18"/></svg>Analyses</a>
-      <a class="nav-item" data-go="ledger"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>Sessions<span class="pill" id="navSessCount"></span></a>
+      <a class="nav-item" data-go="sessions"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>Sessions<span class="pill" id="navSessCount"></span></a>
       <a class="nav-item" data-go="wallet"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20"/></svg>Plateformes</a>
       <div class="nav-sec">Gestion</div>
       <a class="nav-item" id="navOpen"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>Ouvrir une session</a>
@@ -316,17 +333,18 @@
       <div class="nav-sec">Sessions récentes</div>
       <div id="recentList"></div>
     </div>
-    <div class="side-user">
+    <button class="side-user" id="userBtn" title="Paramètres du compte">
       <div class="avatar" id="avatar">TV</div>
-      <div class="su-name" id="holder" contenteditable="true" spellcheck="false" title="Cliquez pour modifier">TITULAIRE</div>
-    </div>
+      <div class="su-info"><div class="su-name" id="holderLabel">TITULAIRE</div><div class="su-sub">Voir les paramètres</div></div>
+      <svg class="su-gear" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    </button>
   </aside>
 
   <main class="main">
     <div class="page-head" id="top">
-      <div><h1>Vue d'ensemble</h1><p>Votre tableau de jeu en un coup d'œil</p></div>
+      <div><h1 id="headTitle">Vue d'ensemble</h1><p id="headSub">Votre tableau de jeu en un coup d'œil</p></div>
       <div class="head-actions">
-        <div class="pill-select">
+        <div class="pill-select" id="periodWrap">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
           <select id="period" aria-label="Période"><option value="all">Depuis le début</option><option value="month">Ce mois-ci</option><option value="3m">3 derniers mois</option><option value="year">Cette année</option></select>
         </div>
@@ -334,7 +352,7 @@
       </div>
     </div>
 
-    <div class="kpis">
+    <div class="kpis" data-views="overview analytics">
       <section class="card kpi">
         <div class="kpi-top"><span class="kico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l5-6 4 4 6-8"/></svg></span>Résultat net<span class="sp"></span><span class="delta flat" id="dNet">—</span></div>
         <div class="kpi-bottom"><div class="kpi-amt num" id="balance">0 €</div><svg class="spark" id="sparkNet" viewBox="0 0 128 46" preserveAspectRatio="none"></svg></div>
@@ -350,7 +368,7 @@
     </div>
 
     <div class="stack">
-      <section class="card" id="analytics">
+      <section class="card" id="analytics" data-views="overview analytics">
         <div class="chart-head">
           <div><h2>Évolution du solde</h2><div class="sub">Résultat net cumulé sur les 12 derniers mois</div></div>
           <div class="legend"><span><i style="background:var(--accent)"></i>Net cumulé</span><span><i class="dot"></i>Gains cumulés</span></div>
@@ -359,7 +377,7 @@
         <div class="months" id="months"></div>
       </section>
 
-      <div class="grid-2">
+      <div class="grid-2" data-views="overview wallet">
         <section class="card" id="wallet">
           <div class="wallet-h">
             <div class="card-h" style="margin:0"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20"/></svg></span>En jeu sur les plateformes</div>
@@ -388,7 +406,7 @@
         </section>
       </div>
 
-      <div class="grid-2">
+      <div class="grid-2" data-views="overview analytics">
         <section class="card goal">
           <div class="card-h" style="justify-content:space-between"><span style="display:inline-flex;align-items:center;gap:9px"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></span>Objectif du mois</span>
             <button class="iconbtn" id="editGoal" title="Modifier"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button></div>
@@ -409,8 +427,8 @@
       <div class="active-grid" id="activeWrap"></div>
     </div>
 
-    <div class="section-title" id="ledger">Historique des sessions</div>
-    <section class="card">
+    <div class="section-title" id="ledger" data-views="overview sessions">Historique des sessions</div>
+    <section class="card" data-views="overview sessions">
       <div class="tx-head"><h2>Toutes vos sessions</h2>
         <div class="tx-controls">
           <div class="search-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
@@ -419,6 +437,32 @@
         </div>
       </div>
       <div id="historyBody"></div>
+    </section>
+
+    <section class="card settings-panel" data-views="settings" style="display:none">
+      <div class="set-block">
+        <div class="set-block-h">Compte</div>
+        <div class="set-row">
+          <div><div class="set-t">Titulaire du compte</div><div class="set-d">Nom affiché sur la carte et les tickets de séance.</div></div>
+          <input id="holderInput" class="field" style="max-width:220px" placeholder="Votre nom">
+        </div>
+        <div class="set-row">
+          <div><div class="set-t">Thème</div><div class="set-d">Apparence claire ou sombre de l'interface.</div></div>
+          <div class="seg theme-seg" style="max-width:220px"><button type="button" data-theme-set="dark">Sombre</button><button type="button" data-theme-set="light">Clair</button></div>
+        </div>
+      </div>
+      <div class="set-block">
+        <div class="set-block-h">Données</div>
+        <div class="set-row">
+          <div><div class="set-t">Réinitialiser les données</div><div class="set-d">Supprime <b>définitivement</b> toutes vos sessions, plateformes et mouvements sur cet appareil. Cette action est irréversible — pensez à exporter avant.</div></div>
+          <button class="btn btn-danger" id="setReset">Tout réinitialiser</button>
+        </div>
+        <div class="set-row">
+          <div><div class="set-t">Exporter les données</div><div class="set-d">Télécharge un fichier CSV de toutes vos sessions et mouvements (sauvegarde).</div></div>
+          <button class="btn btn-outline" id="setExport">Exporter (CSV)</button>
+        </div>
+      </div>
+      <div class="set-note">Vos données restent uniquement sur cet appareil et ne sont jamais envoyées. Pour les conserver d'une session à l'autre, ouvrez ce fichier depuis votre ordinateur.</div>
     </section>
 
     <footer>Données stockées uniquement sur cet appareil. Téléchargez ce fichier et ouvrez-le depuis votre ordinateur pour les conserver d'une session à l'autre.</footer>
@@ -468,12 +512,14 @@
   const timeFR=iso=>{const d=new Date(iso);return isNaN(d)?'':d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});};
   function fromNow(iso){const s=(Date.now()-new Date(iso))/1000;if(s<60)return"à l'instant";if(s<3600)return'il y a '+Math.floor(s/60)+' min';if(s<86400)return'il y a '+Math.floor(s/3600)+' h';return'il y a '+Math.floor(s/86400)+' j';}
 
-  let data=load();save();let goal=rg();
+  let data=load();save();let goal=rg();let current='overview';
 
   // ---- thème ----
   const sunIco='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>';
   const moonIco='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 109.8 9.8z"/></svg>';
-  function applyTheme(t){document.documentElement.setAttribute('data-theme',t);$('#themeIco').innerHTML=t==='dark'?sunIco:moonIco;try{localStorage.setItem(TKEY,t);}catch(e){}}
+  function applyTheme(t){document.documentElement.setAttribute('data-theme',t);$('#themeIco').innerHTML=t==='dark'?sunIco:moonIco;
+    document.querySelectorAll('.theme-seg button').forEach(b=>b.classList.toggle('on',b.dataset.themeSet===t));
+    try{localStorage.setItem(TKEY,t);}catch(e){}}
   let theme;try{theme=localStorage.getItem(TKEY)||'dark';}catch(e){theme='dark';}
   applyTheme(theme);
   $('#navTheme').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
@@ -626,7 +672,7 @@
   }
   function renderActive(){
     const open=data.sessions.filter(s=>s.status==='open');
-    $('#activeSection').style.display=open.length?'block':'none';$('#activeCount').textContent=open.length;
+    $('#activeCount').textContent=open.length;
     $('#activeWrap').innerHTML=open.map(s=>{const net=sessNet(s),p=getPlat(s.platformId);return`<div class="sess" data-sid="${s.id}">
       <div class="sess-top"><div><span class="badge open"><span class="live"></span>En cours</span><div class="plt">${esc(s.platformName)}</div></div><div class="sess-net ${cls(net)} num">${signM(net)}</div></div>
       <div class="sess-meta"><span>Ouverte ${fromNow(s.openedAt)}</span><span>·</span><span>${s.txns.length} transaction${s.txns.length>1?'s':''}</span><span>·</span><span>Reste : <b style="color:var(--ink)">${money(p?p.balance:0)}</b></span></div>
@@ -635,7 +681,10 @@
         <input class="field atx-amt" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Montant €" style="max-width:120px"><button class="btn btn-teal btn-sm" data-act="addtxn">+ Ajouter</button></div>
       <div class="sess-foot"><button class="btn btn-outline btn-sm" data-act="detail">Détail</button><span class="sp"></span><button class="btn btn-teal btn-sm" data-act="close">✓ Clôturer</button>
         <button class="iconbtn del" data-act="del" title="Supprimer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button></div></div>`;}).join('');
+    updateActive();
   }
+  function updateActive(){const open=data.sessions.filter(s=>s.status==='open').length;
+    $('#activeSection').style.display=(open&&(current==='overview'||current==='sessions'))?'block':'none';}
   $('#activeWrap').addEventListener('click',e=>{
     const card=e.target.closest('.sess');if(!card)return;const sid=card.dataset.sid;
     const tg=e.target.closest('[data-tg]');if(tg){card.querySelectorAll('.seg-mini button').forEach(b=>b.classList.remove('on'));tg.classList.add('on');return;}
@@ -779,21 +828,52 @@
     const csv='\uFEFF'+[head.join(';'),...lines].join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='tapis-vert.csv';a.click();URL.revokeObjectURL(url);}
   $('#navExport').addEventListener('click',exportCSV);
 
-  const holderEl=$('#holder');holderEl.textContent=rh();
+  // ---- titulaire / avatar ----
+  let holderName=rh();
   const initials=n=>{const w=n.trim().split(/\s+/).filter(Boolean);return((w[0]||'T')[0]+(w[1]?w[1][0]:(w[0]||'V')[1]||'V')).toUpperCase();};
-  const syncAvatar=()=>{$('#avatar').textContent=initials(holderEl.textContent);};syncAvatar();
-  holderEl.addEventListener('blur',()=>{const t=holderEl.textContent.trim()||'TITULAIRE';holderEl.textContent=t;wh(t);syncAvatar();});
-  holderEl.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();holderEl.blur();}});
+  function syncHolder(){$('#avatar').textContent=initials(holderName);$('#holderLabel').textContent=holderName;}
+  syncHolder();
+
+  // ---- paramètres ----
+  function renderSettings(){
+    $('#holderInput').value=holderName==='TITULAIRE'?'':holderName;
+    const th=document.documentElement.getAttribute('data-theme');
+    document.querySelectorAll('.theme-seg button').forEach(b=>b.classList.toggle('on',b.dataset.themeSet===th));
+  }
+  $('#holderInput').addEventListener('input',e=>{holderName=e.target.value.trim()||'TITULAIRE';wh(holderName);syncHolder();});
+  document.querySelectorAll('.theme-seg button').forEach(b=>b.addEventListener('click',()=>applyTheme(b.dataset.themeSet)));
+  $('#setExport').addEventListener('click',exportCSV);
+  function resetData(){
+    if(!confirm('Réinitialiser TOUTES les données ? Sessions, plateformes et mouvements seront supprimés.'))return;
+    if(!confirm('Dernière confirmation : cette action est définitive et irréversible.'))return;
+    data={platforms:[],sessions:[],movements:[]};goal=0;
+    try{localStorage.removeItem(K);localStorage.removeItem(K2);localStorage.removeItem(K1);localStorage.removeItem(GKEY);}catch(e){}
+    save();renderAll();showView('overview');alert('Données réinitialisées.');
+  }
+  $('#setReset').addEventListener('click',resetData);
+
+  // ---- navigation par vues ----
+  const titles={overview:["Vue d'ensemble","Votre tableau de jeu en un coup d'œil"],analytics:["Analyses","Vos performances, en détail"],sessions:["Sessions","Vos parties, en cours et passées"],wallet:["Plateformes","L'argent en jeu et vos mouvements"],settings:["Paramètres","Votre compte et vos données"]};
+  function showView(v){
+    current=v;
+    document.querySelectorAll('[data-views]').forEach(el=>{el.style.display=el.dataset.views.split(' ').includes(v)?'':'none';});
+    document.querySelectorAll('.nav-item[data-go]').forEach(x=>x.classList.toggle('active',x.dataset.go===v));
+    const t=titles[v]||titles.overview;$('#headTitle').textContent=t[0];$('#headSub').textContent=t[1];
+    $('#periodWrap').style.display=(v==='overview'||v==='analytics')?'':'none';
+    $('#openBtn').style.display=(v==='settings')?'none':'';
+    if(v==='settings')renderSettings();
+    updateActive();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  $('#userBtn').addEventListener('click',()=>showView('settings'));
+  document.querySelectorAll('.nav-item[data-go]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();showView(a.dataset.go);}));
 
   $('#openBtn').addEventListener('click',openSessionModal);$('#navOpen').addEventListener('click',openSessionModal);
   $('#period').addEventListener('change',renderTop);
   ['#search','#fltStat'].forEach(s=>$(s).addEventListener('input',renderHistory));
-  document.querySelectorAll('.nav-item[data-go]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();
-    document.querySelectorAll('.nav-item[data-go]').forEach(x=>x.classList.remove('active'));a.classList.add('active');
-    const el=document.getElementById(a.dataset.go);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}));
 
   function renderAll(){renderTop();renderArea();renderPlatforms();renderCashbox();renderGoal();renderActive();renderHistory();renderRecent();}
-  renderAll();
+  renderAll();showView('overview');
 })();
 </script>
 </body>
