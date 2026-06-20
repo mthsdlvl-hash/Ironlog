@@ -276,7 +276,36 @@
   .detail-meta{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--muted);font-weight:600}
   .detail-meta b{color:var(--ink);font-weight:800}
 
-  footer{margin-top:30px;text-align:center;font-size:12px;color:var(--muted);line-height:1.7;opacity:.85}
+  /* ---- ticket de caisse ---- */
+  .ticket{width:300px;margin:0 auto;background:#fff;color:#15110c;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,'Liberation Mono',monospace;font-size:12px;line-height:1.55;
+    padding:22px 20px;position:relative;box-shadow:0 14px 34px rgba(0,0,0,.45)}
+  .ticket::before,.ticket::after{content:"";position:absolute;left:0;right:0;height:8px;
+    background:linear-gradient(45deg,transparent 33.333%,#fff 33.333%,#fff 66.667%,transparent 66.667%),
+              linear-gradient(-45deg,transparent 33.333%,#fff 33.333%,#fff 66.667%,transparent 66.667%);
+    background-size:12px 16px;background-repeat:repeat-x}
+  .ticket::before{top:-8px}.ticket::after{bottom:-8px;transform:scaleY(-1)}
+  .ticket .center{text-align:center}
+  .ticket .big{font-size:17px;font-weight:700;letter-spacing:2px}
+  .ticket .sep{border-top:1px dashed #b9b2a8;margin:9px 0}
+  .ticket .row{display:flex;justify-content:space-between;gap:10px}
+  .ticket .row .r{text-align:right;white-space:nowrap}
+  .ticket .muted{color:#7a736a}
+  .ticket .net{font-size:15px;font-weight:700;letter-spacing:.5px}
+  .ticket .barcode{display:flex;justify-content:center;align-items:flex-end;gap:1px;height:44px;margin:12px 0 6px}
+  .ticket .barcode span{display:block;height:100%;background:#15110c}
+
+  @media print{
+    body{background:#fff}
+    body *{visibility:hidden}
+    #printRoot,#printRoot *{visibility:visible}
+    #printRoot{position:absolute;left:0;top:0;width:100%}
+    .ticket{box-shadow:none;width:100%;max-width:320px;margin:0 auto}
+    .ticket::before,.ticket::after{display:none}
+    @page{margin:8mm}
+  }
+
+
   *:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -623,7 +652,7 @@
     const act=e.target.closest('[data-act]');if(!act)return;const a=act.dataset.act;
     if(a==='addtxn'){const jeu=card.querySelector('.atx-jeu').value.trim();const amt=parseFloat(card.querySelector('.atx-amt').value);const type=card.querySelector('.seg-mini button.on').dataset.tg;
       if(isNaN(amt)||amt<=0){card.querySelector('.atx-amt').focus();return;}addTxn(sid,jeu,type,amt);}
-    else if(a==='close')closeSession(sid);else if(a==='del')delSession(sid);else if(a==='detail')openDetail(sid);
+    else if(a==='close')closeAndTicket(sid);else if(a==='del')delSession(sid);else if(a==='detail')openDetail(sid);
   });
 
   function filteredSessions(){const q=$('#search').value.trim().toLowerCase(),fs=$('#fltStat').value;
@@ -659,7 +688,8 @@
     const act=e.target.closest('[data-act]');if(!act)return;const a=act.dataset.act;
     if(a==='addtxn'){const jeu=host.querySelector('.atx-jeu').value.trim();const amt=parseFloat(host.querySelector('.atx-amt').value);const type=host.querySelector('.seg-mini button.on').dataset.tg;
       if(isNaN(amt)||amt<=0){host.querySelector('.atx-amt').focus();return;}addTxn(detailId,jeu,type,amt);openDetail(detailId);}
-    else if(a==='close'){closeSession(detailId);closeOverlay();}
+    else if(a==='close'){const cid=detailId;closeSession(cid);openReceipt(cid);}
+    else if(a==='ticket'){openReceipt(detailId);}
     else if(a==='reopen'){reopenSession(detailId);openDetail(detailId);}
     else if(a==='del'){delSession(detailId);if(!data.sessions.some(x=>x.id===detailId))closeOverlay();}
   });
@@ -706,8 +736,47 @@
         <div><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px">TRANSACTIONS (${s.txns.length})</div><div class="txlist" style="max-height:240px">${txRows(s,true)}</div></div>
         ${s.status==='open'?`<div class="addtx" data-sid="${s.id}"><div class="row1"><input class="field atx-jeu" list="jeuList" placeholder="Jeu"><div class="seg-mini"><button type="button" data-tg="gain" class="on">Gain</button><button type="button" data-tg="perte">Perte</button></div></div><input class="field atx-amt" type="number" min="0" step="0.01" placeholder="Montant €" style="max-width:120px"><button class="btn btn-teal btn-sm" data-act="addtxn">+ Ajouter</button></div>`:''}
       </div>
-      <div class="modal-foot"><button class="btn btn-danger" data-act="del">Supprimer</button><span class="sp"></span>${s.status==='open'?`<button class="btn btn-teal" data-act="close">Clôturer</button>`:`<button class="btn btn-outline" data-act="reopen">Rouvrir</button>`}</div>`;
+      <div class="modal-foot"><button class="btn btn-danger" data-act="del">Supprimer</button><span class="sp"></span>${s.status==='open'?`<button class="btn btn-teal" data-act="close">Clôturer</button>`:`<button class="btn btn-outline" data-act="ticket"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>Ticket</button><button class="btn btn-quiet" data-act="reopen">Rouvrir</button>`}</div>`;
     openOverlay();}
+
+  // ---- ticket de caisse ----
+  function duration(a,b){if(!a||!b)return'—';let s=(new Date(b)-new Date(a))/1000;if(s<0)s=0;const h=Math.floor(s/3600),m=Math.floor(s%3600/60);return h?`${h} h ${String(m).padStart(2,'0')}`:`${m} min`;}
+  function barcode(seed){let html='';for(let i=0;i<46;i++){const c=seed.charCodeAt(i%seed.length)+i*7;const w=1+(c%4);const gap=(c>>2)%3===0;html+=`<span style="width:${w}px;${gap?'background:transparent':''}"></span>`;}return`<div class="barcode">${html}</div>`;}
+  function buildTicketHTML(s){
+    const items=[...s.txns].sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+    let g=0,p=0;items.forEach(t=>{if(t.type==='gain')g+=+t.montant;else p+=+t.montant;});
+    const net=g-p,plat=getPlat(s.platformId),no='TV-'+s.id.slice(-6).toUpperCase();
+    const rows=items.length?items.map(t=>`<div class="row"><span>${timeFR(t.time)}&nbsp;&nbsp;${esc(t.jeu||'Jeu')}</span><span class="r">${t.type==='gain'?'+':'−'}${money(+t.montant)}</span></div>`).join(''):'<div class="center muted">Aucune transaction</div>';
+    return`<div class="ticket">
+      <div class="center big">♣ TAPIS VERT</div>
+      <div class="center muted" style="letter-spacing:3px;font-size:10px;margin-top:2px">TICKET DE SÉANCE</div>
+      <div class="sep"></div>
+      <div class="row"><span class="muted">Plateforme</span><span class="r">${esc(s.platformName)}</span></div>
+      <div class="row"><span class="muted">Ouverture</span><span class="r">${dateFR(s.openedAt)} ${timeFR(s.openedAt)}</span></div>
+      <div class="row"><span class="muted">Clôture</span><span class="r">${s.closedAt?dateFR(s.closedAt)+' '+timeFR(s.closedAt):'—'}</span></div>
+      <div class="row"><span class="muted">Durée</span><span class="r">${duration(s.openedAt,s.closedAt)}</span></div>
+      <div class="sep"></div>
+      <div class="muted" style="font-size:10px;letter-spacing:1px;margin-bottom:5px">DÉTAIL · ${items.length} ligne${items.length>1?'s':''}</div>
+      ${rows}
+      <div class="sep"></div>
+      <div class="row"><span class="muted">Total gains</span><span class="r">+${money(g)}</span></div>
+      <div class="row"><span class="muted">Total pertes</span><span class="r">−${money(p)}</span></div>
+      <div class="sep"></div>
+      <div class="row net"><span>RÉSULTAT NET</span><span class="r">${signM(net)}</span></div>
+      <div class="sep"></div>
+      <div class="row"><span class="muted">Reste sur la plateforme</span><span class="r">${money(plat?plat.balance:0)}</span></div>
+      <div class="sep"></div>
+      <div class="center muted" style="font-size:10px;line-height:1.7">Merci d'avoir joué avec modération.<br>Joueurs Info Service : 09 74 75 13 13</div>
+      ${barcode(s.id)}
+      <div class="center muted" style="font-size:10px;letter-spacing:3px">${no}</div>
+    </div>`;
+  }
+  function openReceipt(id){const s=data.sessions.find(x=>x.id===id);if(!s)return;detailId=null;
+    host.innerHTML=`<div class="modal-head"><h2>Ticket de séance</h2><button class="iconbtn" data-close><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <div class="modal-body" style="background:transparent"><div id="printRoot">${buildTicketHTML(s)}</div></div>
+      <div class="modal-foot"><button class="btn btn-quiet" data-close>Fermer</button><button class="btn btn-teal" id="tkPrint"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>Imprimer</button></div>`;
+    openOverlay();host.querySelector('#tkPrint').addEventListener('click',()=>window.print());}
+  function closeAndTicket(id){closeSession(id);openReceipt(id);}
 
   function askGoal(){const v=prompt('Objectif de résultat net pour ce mois-ci (€) :',goal||'');if(v==null)return;const n=parseFloat(String(v).replace(',','.'));goal=isNaN(n)||n<0?0:Math.round(n);wg(goal);renderGoal();}
   $('#setGoal').addEventListener('click',askGoal);$('#editGoal').addEventListener('click',askGoal);
